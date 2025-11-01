@@ -30,82 +30,66 @@ public class ApplicationDbContext : Microsoft.EntityFrameworkCore.DbContext
 
         modelBuilder.Entity<Usuario>()
             .Property(u => u.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<TipoIdentificador>()
             .Property(t => t.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<Pais>()
             .Property(p => p.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<Perfil>()
             .Property(p => p.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<Organizacion>()
             .Property(o => o.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<Rol>()
             .Property(r => r.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<RolUsuarioOrganizacion>()
             .Property(r => r.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<CategoriaActividad>()
             .Property(c => c.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<Actividad>()
             .Property(a => a.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<Actividad>()
             .Property(a => a.Situacion)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<CoordinadorActividad>()
             .Property(c => c.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<HorarioActividad>()
             .Property(h => h.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<ParticipanteActividad>()
             .Property(p => p.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<ParticipanteActividad>()
             .Property(p => p.Situacion)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<CertificacionParticipacion>()
             .Property(c => c.Estado)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
 
         modelBuilder.Entity<CertificacionParticipacion>()
             .Property(c => c.Situacion)
-            .HasMaxLength(1)
-            .IsFixedLength();
+            .HasMaxLength(1);
     }
 }
