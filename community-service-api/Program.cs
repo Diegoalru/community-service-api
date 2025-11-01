@@ -30,19 +30,15 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-app.UseSwagger();
-app.UseSwaggerUI(options =>
+var env = app.Environment;
+
+if (env.IsDevelopment())
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Community Service API v1");
-});
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
-app.MapGet("/", () => Results.Redirect("/swagger"));
-
 app.Run();
