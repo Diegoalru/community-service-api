@@ -9,7 +9,7 @@ public static class MappingExtensions
     public static UsuarioDto ToDto(this Usuario entity) => new()
     {
         IdUsuario = entity.IdUsuario,
-        Email = entity.Email,
+        Email = entity.Username,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
         Estado = entity.Estado
@@ -17,8 +17,8 @@ public static class MappingExtensions
 
     public static Usuario ToEntity(this UsuarioCreateDto dto) => new()
     {
-        IdUsuario = Guid.NewGuid(),
-        Email = dto.Email,
+        IdUsuario = 0, // Assuming the database will auto-generate the ID
+        Username = dto.Usuario,
         Password = dto.Password,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
@@ -27,7 +27,7 @@ public static class MappingExtensions
 
     public static void UpdateFromDto(this Usuario entity, UsuarioUpdateDto dto)
     {
-        entity.Email = dto.Email;
+        entity.Username = dto.Usuario;
         entity.Password = dto.Password;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;

@@ -6,12 +6,11 @@ namespace community_service_api.Models.Entities;
 public class Usuario
 {
     [Key]
-    public Guid IdUsuario { get; set; }
+    public int IdUsuario { get; set; }
 
     [Required]
-    [EmailAddress]
     [MaxLength(200)]
-    public string Email { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
 
     [Required]
     [MinLength(6)]

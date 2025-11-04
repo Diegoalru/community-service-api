@@ -1,4 +1,5 @@
 using community_service_api.DbContext;
+using community_service_api.Middleware;
 using community_service_api.Repositories;
 using community_service_api.Services;
 using Microsoft.EntityFrameworkCore;
@@ -23,12 +24,16 @@ builder.Services.AddScoped<ICoordinadorActividadService, CoordinadorActividadSer
 builder.Services.AddScoped<IHorarioActividadService, HorarioActividadService>();
 builder.Services.AddScoped<IParticipanteActividadService, ParticipanteActividadService>();
 builder.Services.AddScoped<ICertificacionParticipacionService, CertificacionParticipacionService>();
+builder.Services.AddScoped<IProcedureRepository, ProcedureRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Register the custom exception handling middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 var env = app.Environment;
 
@@ -38,7 +43,7 @@ if (env.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
