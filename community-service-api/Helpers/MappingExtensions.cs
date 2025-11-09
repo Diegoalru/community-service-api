@@ -12,7 +12,7 @@ public static class MappingExtensions
         Username = entity.Username,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static Usuario ToEntity(this UsuarioCreateDto dto) => new()
@@ -21,7 +21,7 @@ public static class MappingExtensions
         Password = dto.Password,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this Usuario entity, UsuarioUpdateDto dto)
@@ -30,7 +30,7 @@ public static class MappingExtensions
         entity.Password = dto.Password;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static TipoIdentificadorDto ToDto(this TipoIdentificador entity) => new()
@@ -39,7 +39,7 @@ public static class MappingExtensions
         Descripcion = entity.Descripcion,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0],
     };
 
     public static TipoIdentificador ToEntity(this TipoIdentificadorCreateDto dto) => new()
@@ -47,7 +47,7 @@ public static class MappingExtensions
         Descripcion = dto.Descripcion,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado),
     };
 
     public static void UpdateFromDto(this TipoIdentificador entity, TipoIdentificadorUpdateDto dto)
@@ -55,7 +55,7 @@ public static class MappingExtensions
         entity.Descripcion = dto.Descripcion;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static PaisDto ToDto(this Pais entity) => new()
@@ -64,7 +64,7 @@ public static class MappingExtensions
         Nombre = entity.Nombre,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static Pais ToEntity(this PaisCreateDto dto) => new()
@@ -72,7 +72,7 @@ public static class MappingExtensions
         Nombre = dto.Nombre,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this Pais entity, PaisUpdateDto dto)
@@ -80,7 +80,7 @@ public static class MappingExtensions
         entity.Nombre = dto.Nombre;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static PerfilDto ToDto(this Perfil entity) => new()
@@ -97,7 +97,7 @@ public static class MappingExtensions
         Bibliografia = entity.Bibliografia,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static Perfil ToEntity(this PerfilCreateDto dto) => new()
@@ -113,7 +113,7 @@ public static class MappingExtensions
         Bibliografia = dto.Bibliografia,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this Perfil entity, PerfilUpdateDto dto)
@@ -129,7 +129,7 @@ public static class MappingExtensions
         entity.Bibliografia = dto.Bibliografia;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static OrganizacionDto ToDto(this Organizacion entity) => new()
@@ -144,7 +144,7 @@ public static class MappingExtensions
         SitioWeb = entity.SitioWeb,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static Organizacion ToEntity(this OrganizacionCreateDto dto) => new()
@@ -158,7 +158,7 @@ public static class MappingExtensions
         SitioWeb = dto.SitioWeb,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this Organizacion entity, OrganizacionUpdateDto dto)
@@ -172,7 +172,7 @@ public static class MappingExtensions
         entity.SitioWeb = dto.SitioWeb;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static RolDto ToDto(this Rol entity) => new()
@@ -181,7 +181,7 @@ public static class MappingExtensions
         Nombre = entity.Nombre,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static Rol ToEntity(this RolCreateDto dto) => new()
@@ -189,7 +189,7 @@ public static class MappingExtensions
         Nombre = dto.Nombre,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this Rol entity, RolUpdateDto dto)
@@ -197,7 +197,7 @@ public static class MappingExtensions
         entity.Nombre = dto.Nombre;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static RolUsuarioOrganizacionDto ToDto(this RolUsuarioOrganizacion entity) => new()
@@ -209,7 +209,7 @@ public static class MappingExtensions
         IdRol = entity.IdRol,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static RolUsuarioOrganizacion ToEntity(this RolUsuarioOrganizacionCreateDto dto) => new()
@@ -220,7 +220,7 @@ public static class MappingExtensions
         IdRol = dto.IdRol,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this RolUsuarioOrganizacion entity, RolUsuarioOrganizacionUpdateDto dto)
@@ -231,7 +231,7 @@ public static class MappingExtensions
         entity.IdRol = dto.IdRol;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static CategoriaActividadDto ToDto(this CategoriaActividad entity) => new()
@@ -240,7 +240,7 @@ public static class MappingExtensions
         Nombre = entity.Nombre,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static CategoriaActividad ToEntity(this CategoriaActividadCreateDto dto) => new()
@@ -248,7 +248,7 @@ public static class MappingExtensions
         Nombre = dto.Nombre,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this CategoriaActividad entity, CategoriaActividadUpdateDto dto)
@@ -256,7 +256,7 @@ public static class MappingExtensions
         entity.Nombre = dto.Nombre;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static ActividadDto ToDto(this Actividad entity) => new()
@@ -272,10 +272,10 @@ public static class MappingExtensions
         FechaFin = entity.FechaFin,
         Horas = entity.Horas,
         Cupos = entity.Cupos,
-        Situacion = entity.Situacion,
+        Situacion = entity.Situacion[0],
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static Actividad ToEntity(this ActividadCreateDto dto) => new()
@@ -290,10 +290,10 @@ public static class MappingExtensions
         FechaFin = dto.FechaFin,
         Horas = dto.Horas,
         Cupos = dto.Cupos,
-        Situacion = dto.Situacion,
+        Situacion = char.ToString(dto.Situacion),
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this Actividad entity, ActividadUpdateDto dto)
@@ -308,10 +308,10 @@ public static class MappingExtensions
         entity.FechaFin = dto.FechaFin;
         entity.Horas = dto.Horas;
         entity.Cupos = dto.Cupos;
-        entity.Situacion = dto.Situacion;
+        entity.Situacion = char.ToString(dto.Situacion);
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static CoordinadorActividadDto ToDto(this CoordinadorActividad entity) => new()
@@ -322,7 +322,7 @@ public static class MappingExtensions
         IdUsuarioCoordinador = entity.IdUsuarioCoordinador,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static CoordinadorActividad ToEntity(this CoordinadorActividadCreateDto dto) => new()
@@ -332,7 +332,7 @@ public static class MappingExtensions
         IdUsuarioCoordinador = dto.IdUsuarioCoordinador,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this CoordinadorActividad entity, CoordinadorActividadUpdateDto dto)
@@ -342,7 +342,7 @@ public static class MappingExtensions
         entity.IdUsuarioCoordinador = dto.IdUsuarioCoordinador;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static HorarioActividadDto ToDto(this HorarioActividad entity) => new()
@@ -355,10 +355,10 @@ public static class MappingExtensions
         HoraInicio = entity.HoraInicio,
         HoraFin = entity.HoraFin,
         Descripcion = entity.Descripcion,
-        Situacion = entity.Situacion,
+        Situacion = entity.Situacion[0],
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static HorarioActividad ToEntity(this HorarioActividadCreateDto dto) => new()
@@ -370,10 +370,10 @@ public static class MappingExtensions
         HoraInicio = dto.HoraInicio,
         HoraFin = dto.HoraFin,
         Descripcion = dto.Descripcion,
-        Situacion = dto.Situacion,
+        Situacion = char.ToString(dto.Situacion),
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this HorarioActividad entity, HorarioActividadUpdateDto dto)
@@ -385,10 +385,10 @@ public static class MappingExtensions
         entity.HoraInicio = dto.HoraInicio;
         entity.HoraFin = dto.HoraFin;
         entity.Descripcion = dto.Descripcion;
-        entity.Situacion = dto.Situacion;
+        entity.Situacion = char.ToString(dto.Situacion);
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static ParticipanteActividadDto ToDto(this ParticipanteActividad entity) => new()
@@ -400,10 +400,10 @@ public static class MappingExtensions
         IdUsuarioVoluntario = entity.IdUsuarioVoluntario,
         FechaInscripcion = entity.FechaInscripcion,
         FechaRetiro = entity.FechaRetiro,
-        Situacion = entity.Situacion,
+        Situacion = entity.Situacion[0],
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static ParticipanteActividad ToEntity(this ParticipanteActividadCreateDto dto) => new()
@@ -414,10 +414,10 @@ public static class MappingExtensions
         IdUsuarioVoluntario = dto.IdUsuarioVoluntario,
         FechaInscripcion = dto.FechaInscripcion,
         FechaRetiro = dto.FechaRetiro,
-        Situacion = dto.Situacion,
+        Situacion = char.ToString(dto.Situacion),
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado)
     };
 
     public static void UpdateFromDto(this ParticipanteActividad entity, ParticipanteActividadUpdateDto dto)
@@ -428,10 +428,10 @@ public static class MappingExtensions
         entity.IdUsuarioVoluntario = dto.IdUsuarioVoluntario;
         entity.FechaInscripcion = dto.FechaInscripcion;
         entity.FechaRetiro = dto.FechaRetiro;
-        entity.Situacion = dto.Situacion;
+        entity.Situacion = char.ToString(dto.Situacion);
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 
     public static CertificacionParticipacionDto ToDto(this CertificadoParticipacion entity) => new()
@@ -446,7 +446,7 @@ public static class MappingExtensions
         DiasTotales = entity.DiasTotales,
         FechaPrimeraAsistencia = entity.FechaPrimeraAsistencia,
         FechaUltimaAsistencia = entity.FechaUltimaAsistencia,
-        Situacion = entity.Situacion,
+        Situacion = entity.Situacion[0],
         Observaciones = entity.Observaciones,
         FechaEnvio = entity.FechaEnvio,
         IntentosEnvio = entity.IntentosEnvio,
@@ -454,7 +454,7 @@ public static class MappingExtensions
         UltimoErrorEnvio = entity.UltimoErrorEnvio,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
-        Estado = entity.Estado
+        Estado = entity.Estado[0]
     };
 
     public static CertificadoParticipacion ToEntity(this CertificacionParticipacionCreateDto dto) => new()
@@ -468,7 +468,7 @@ public static class MappingExtensions
         DiasTotales = dto.DiasTotales,
         FechaPrimeraAsistencia = dto.FechaPrimeraAsistencia,
         FechaUltimaAsistencia = dto.FechaUltimaAsistencia,
-        Situacion = dto.Situacion,
+        Situacion = char.ToString(dto.Situacion),
         Observaciones = dto.Observaciones,
         FechaEnvio = dto.FechaEnvio,
         IntentosEnvio = dto.IntentosEnvio,
@@ -476,7 +476,7 @@ public static class MappingExtensions
         UltimoErrorEnvio = dto.UltimoErrorEnvio,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado
+        Estado = char.ToString(dto.Estado),
     };
 
     public static void UpdateFromDto(this CertificadoParticipacion entity, CertificacionParticipacionUpdateDto dto)
@@ -490,7 +490,7 @@ public static class MappingExtensions
         entity.DiasTotales = dto.DiasTotales;
         entity.FechaPrimeraAsistencia = dto.FechaPrimeraAsistencia;
         entity.FechaUltimaAsistencia = dto.FechaUltimaAsistencia;
-        entity.Situacion = dto.Situacion;
+        entity.Situacion = char.ToString(dto.Situacion);
         entity.Observaciones = dto.Observaciones;
         entity.FechaEnvio = dto.FechaEnvio;
         entity.IntentosEnvio = dto.IntentosEnvio;
@@ -498,6 +498,6 @@ public static class MappingExtensions
         entity.UltimoErrorEnvio = dto.UltimoErrorEnvio;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = dto.Estado;
+        entity.Estado = char.ToString(dto.Estado);
     }
 }
