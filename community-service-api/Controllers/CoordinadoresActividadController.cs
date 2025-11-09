@@ -24,8 +24,8 @@ public class CoordinadoresActividadController : ControllerBase
         return Ok(coordinadores);
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id)
     {
         var coordinador = await _service.GetByIdAsync(id);
         if (coordinador is null)
@@ -43,8 +43,8 @@ public class CoordinadoresActividadController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.IdCoordinadorActividad }, created);
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] CoordinadorActividadUpdateDto dto)
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] CoordinadorActividadUpdateDto dto)
     {
         var updated = await _service.UpdateAsync(id, dto);
         if (!updated)
@@ -55,8 +55,8 @@ public class CoordinadoresActividadController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _service.DeleteAsync(id);
         if (!deleted)

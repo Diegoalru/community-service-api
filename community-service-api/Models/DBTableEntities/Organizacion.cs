@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace community_service_api.Models.DBTableEntities;
@@ -9,17 +9,11 @@ public partial class Organizacion
 
     public int IdUsuarioCreador { get; set; }
 
-    public int IdPais { get; set; }
-
     public int IdUbicacion { get; set; }
 
     public string Nombre { get; set; } = null!;
 
     public string Descripcion { get; set; } = null!;
-
-    public string Direccion { get; set; } = null!;
-
-    public string Ciudad { get; set; } = null!;
 
     public string Email { get; set; } = null!;
 
@@ -38,8 +32,6 @@ public partial class Organizacion
     public virtual ICollection<CoordinadorActividad> CoordinadorActividad { get; set; } = new List<CoordinadorActividad>();
 
     public virtual ICollection<HorarioActividad> HorarioActividad { get; set; } = new List<HorarioActividad>();
-
-    public virtual Pais IdPaisNavigation { get; set; } = null!;
 
     public virtual Ubicacion IdUbicacionNavigation { get; set; } = null!;
 

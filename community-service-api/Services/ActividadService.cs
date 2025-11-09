@@ -12,10 +12,10 @@ namespace community_service_api.Services;
 public interface IActividadService
 {
     Task<IEnumerable<ActividadDto>> GetAllAsync();
-    Task<ActividadDto?> GetByIdAsync(Guid id);
+    Task<ActividadDto?> GetByIdAsync(int id);
     Task<ActividadDto> CreateAsync(ActividadCreateDto dto);
-    Task<bool> UpdateAsync(Guid id, ActividadUpdateDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<bool> UpdateAsync(int id, ActividadUpdateDto dto);
+    Task<bool> DeleteAsync(int id);
 }
 
 public class ActividadService : IActividadService
@@ -33,7 +33,7 @@ public class ActividadService : IActividadService
         return entities.Select(e => e.ToDto());
     }
 
-    public async Task<ActividadDto?> GetByIdAsync(Guid id)
+    public async Task<ActividadDto?> GetByIdAsync(int id)
     {
         var entity = await _repository.GetByIdAsync(id);
         return entity?.ToDto();
@@ -46,7 +46,7 @@ public class ActividadService : IActividadService
         return created.ToDto();
     }
 
-    public async Task<bool> UpdateAsync(Guid id, ActividadUpdateDto dto)
+    public async Task<bool> UpdateAsync(int id, ActividadUpdateDto dto)
     {
         var entity = await _repository.GetByIdAsync(id);
         if (entity is null)
@@ -59,7 +59,7 @@ public class ActividadService : IActividadService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(int id)
     {
         return await _repository.DeleteAsync(id);
     }

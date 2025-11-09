@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace community_service_api.Models.DBTableEntities;
@@ -9,13 +9,13 @@ public partial class Ubicacion
 
     public int IdPais { get; set; }
 
-    public int IdProvincia { get; set; }
+    public int? IdProvincia { get; set; }
 
-    public int IdCanton { get; set; }
+    public int? IdCanton { get; set; }
 
-    public int IdDistrito { get; set; }
+    public int? IdDistrito { get; set; }
 
-    public string Direccion { get; set; } = null!;
+    public string? Direccion { get; set; }
 
     public string? CodigoPostal { get; set; }
 
@@ -31,7 +31,7 @@ public partial class Ubicacion
 
     public virtual ICollection<Actividad> Actividad { get; set; } = new List<Actividad>();
 
-    public virtual Distrito Distrito { get; set; } = null!;
+    public virtual Distrito? Distrito { get; set; }
 
     public virtual ICollection<Organizacion> Organizacion { get; set; } = new List<Organizacion>();
 

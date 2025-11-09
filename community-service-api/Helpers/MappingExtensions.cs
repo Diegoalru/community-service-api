@@ -1,3 +1,4 @@
+using System;
 using community_service_api.Models.DBTableEntities;
 using community_service_api.Models.Dtos;
 
@@ -8,7 +9,7 @@ public static class MappingExtensions
     public static UsuarioDto ToDto(this Usuario entity) => new()
     {
         IdUsuario = entity.IdUsuario,
-        Email = entity.Username,
+        Username = entity.Username,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
         Estado = entity.Estado
@@ -16,8 +17,7 @@ public static class MappingExtensions
 
     public static Usuario ToEntity(this UsuarioCreateDto dto) => new()
     {
-        IdUsuario = 0, // Assuming the database will auto-generate the ID
-        Username = dto.Usuario,
+        Username = dto.Username,
         Password = dto.Password,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
@@ -26,7 +26,7 @@ public static class MappingExtensions
 
     public static void UpdateFromDto(this Usuario entity, UsuarioUpdateDto dto)
     {
-        entity.Username = dto.Usuario;
+        entity.Username = dto.Username;
         entity.Password = dto.Password;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
@@ -37,19 +37,24 @@ public static class MappingExtensions
     {
         IdIdentificador = entity.IdIdentificador,
         Descripcion = entity.Descripcion,
+        FechaDesde = entity.FechaDesde,
+        FechaHasta = entity.FechaHasta,
         Estado = entity.Estado
     };
 
     public static TipoIdentificador ToEntity(this TipoIdentificadorCreateDto dto) => new()
     {
-        IdIdentificador = dto.IdIdentificador,
         Descripcion = dto.Descripcion,
+        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+        FechaHasta = dto.FechaHasta,
         Estado = dto.Estado
     };
 
     public static void UpdateFromDto(this TipoIdentificador entity, TipoIdentificadorUpdateDto dto)
     {
         entity.Descripcion = dto.Descripcion;
+        entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
+        entity.FechaHasta = dto.FechaHasta;
         entity.Estado = dto.Estado;
     }
 
@@ -57,19 +62,24 @@ public static class MappingExtensions
     {
         IdPais = entity.IdPais,
         Nombre = entity.Nombre,
+        FechaDesde = entity.FechaDesde,
+        FechaHasta = entity.FechaHasta,
         Estado = entity.Estado
     };
 
     public static Pais ToEntity(this PaisCreateDto dto) => new()
     {
-        IdPais = dto.IdPais,
         Nombre = dto.Nombre,
+        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+        FechaHasta = dto.FechaHasta,
         Estado = dto.Estado
     };
 
     public static void UpdateFromDto(this Pais entity, PaisUpdateDto dto)
     {
         entity.Nombre = dto.Nombre;
+        entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
+        entity.FechaHasta = dto.FechaHasta;
         entity.Estado = dto.Estado;
     }
 
@@ -77,16 +87,13 @@ public static class MappingExtensions
     {
         IdPerfil = entity.IdPerfil,
         IdUsuario = entity.IdUsuario,
+        IdUbicacion = entity.IdUbicacion,
         IdIdentificador = entity.IdIdentificador,
-        IdPais = entity.IdPais,
+        Identificacion = entity.Identificacion,
         Nombre = entity.Nombre,
         ApellidoP = entity.ApellidoP,
         ApellidoM = entity.ApellidoM,
         FechaNacimiento = entity.FechaNacimiento,
-        Telefono = entity.Telefono,
-        Ciudad = entity.Ciudad,
-        Direccion = entity.Direccion,
-        CodigoPostal = entity.CodigoPostal,
         Bibliografia = entity.Bibliografia,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
@@ -95,18 +102,14 @@ public static class MappingExtensions
 
     public static Perfil ToEntity(this PerfilCreateDto dto) => new()
     {
-        IdPerfil = Guid.NewGuid(),
         IdUsuario = dto.IdUsuario,
+        IdUbicacion = dto.IdUbicacion,
         IdIdentificador = dto.IdIdentificador,
-        IdPais = dto.IdPais,
+        Identificacion = dto.Identificacion,
         Nombre = dto.Nombre,
         ApellidoP = dto.ApellidoP,
         ApellidoM = dto.ApellidoM,
         FechaNacimiento = dto.FechaNacimiento,
-        Telefono = dto.Telefono,
-        Ciudad = dto.Ciudad,
-        Direccion = dto.Direccion,
-        CodigoPostal = dto.CodigoPostal,
         Bibliografia = dto.Bibliografia,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
@@ -116,16 +119,13 @@ public static class MappingExtensions
     public static void UpdateFromDto(this Perfil entity, PerfilUpdateDto dto)
     {
         entity.IdUsuario = dto.IdUsuario;
+        entity.IdUbicacion = dto.IdUbicacion;
         entity.IdIdentificador = dto.IdIdentificador;
-        entity.IdPais = dto.IdPais;
+        entity.Identificacion = dto.Identificacion;
         entity.Nombre = dto.Nombre;
         entity.ApellidoP = dto.ApellidoP;
         entity.ApellidoM = dto.ApellidoM;
         entity.FechaNacimiento = dto.FechaNacimiento;
-        entity.Telefono = dto.Telefono;
-        entity.Ciudad = dto.Ciudad;
-        entity.Direccion = dto.Direccion;
-        entity.CodigoPostal = dto.CodigoPostal;
         entity.Bibliografia = dto.Bibliografia;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
@@ -136,11 +136,9 @@ public static class MappingExtensions
     {
         IdOrganizacion = entity.IdOrganizacion,
         IdUsuarioCreador = entity.IdUsuarioCreador,
-        IdPais = entity.IdPais,
+        IdUbicacion = entity.IdUbicacion,
         Nombre = entity.Nombre,
         Descripcion = entity.Descripcion,
-        Direccion = entity.Direccion,
-        Ciudad = entity.Ciudad,
         Email = entity.Email,
         Telefono = entity.Telefono,
         SitioWeb = entity.SitioWeb,
@@ -151,13 +149,10 @@ public static class MappingExtensions
 
     public static Organizacion ToEntity(this OrganizacionCreateDto dto) => new()
     {
-        IdOrganizacion = Guid.NewGuid(),
         IdUsuarioCreador = dto.IdUsuarioCreador,
-        IdPais = dto.IdPais,
+        IdUbicacion = dto.IdUbicacion,
         Nombre = dto.Nombre,
         Descripcion = dto.Descripcion,
-        Direccion = dto.Direccion,
-        Ciudad = dto.Ciudad,
         Email = dto.Email,
         Telefono = dto.Telefono,
         SitioWeb = dto.SitioWeb,
@@ -169,11 +164,9 @@ public static class MappingExtensions
     public static void UpdateFromDto(this Organizacion entity, OrganizacionUpdateDto dto)
     {
         entity.IdUsuarioCreador = dto.IdUsuarioCreador;
-        entity.IdPais = dto.IdPais;
+        entity.IdUbicacion = dto.IdUbicacion;
         entity.Nombre = dto.Nombre;
         entity.Descripcion = dto.Descripcion;
-        entity.Direccion = dto.Direccion;
-        entity.Ciudad = dto.Ciudad;
         entity.Email = dto.Email;
         entity.Telefono = dto.Telefono;
         entity.SitioWeb = dto.SitioWeb;
@@ -186,19 +179,24 @@ public static class MappingExtensions
     {
         IdRol = entity.IdRol,
         Nombre = entity.Nombre,
+        FechaDesde = entity.FechaDesde,
+        FechaHasta = entity.FechaHasta,
         Estado = entity.Estado
     };
 
     public static Rol ToEntity(this RolCreateDto dto) => new()
     {
-        IdRol = dto.IdRol,
         Nombre = dto.Nombre,
+        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+        FechaHasta = dto.FechaHasta,
         Estado = dto.Estado
     };
 
     public static void UpdateFromDto(this Rol entity, RolUpdateDto dto)
     {
         entity.Nombre = dto.Nombre;
+        entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
+        entity.FechaHasta = dto.FechaHasta;
         entity.Estado = dto.Estado;
     }
 
@@ -216,7 +214,6 @@ public static class MappingExtensions
 
     public static RolUsuarioOrganizacion ToEntity(this RolUsuarioOrganizacionCreateDto dto) => new()
     {
-        IdRolUsuarioOrganizacion = Guid.NewGuid(),
         IdOrganizacion = dto.IdOrganizacion,
         IdUsuarioAsignado = dto.IdUsuarioAsignado,
         IdUsuarioAdministrador = dto.IdUsuarioAdministrador,
@@ -241,19 +238,24 @@ public static class MappingExtensions
     {
         IdCategoriaActividad = entity.IdCategoriaActividad,
         Nombre = entity.Nombre,
+        FechaDesde = entity.FechaDesde,
+        FechaHasta = entity.FechaHasta,
         Estado = entity.Estado
     };
 
     public static CategoriaActividad ToEntity(this CategoriaActividadCreateDto dto) => new()
     {
-        IdCategoriaActividad = dto.IdCategoriaActividad,
         Nombre = dto.Nombre,
+        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+        FechaHasta = dto.FechaHasta,
         Estado = dto.Estado
     };
 
     public static void UpdateFromDto(this CategoriaActividad entity, CategoriaActividadUpdateDto dto)
     {
         entity.Nombre = dto.Nombre;
+        entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
+        entity.FechaHasta = dto.FechaHasta;
         entity.Estado = dto.Estado;
     }
 
@@ -263,10 +265,9 @@ public static class MappingExtensions
         IdOrganizacion = entity.IdOrganizacion,
         IdUsuarioCreador = entity.IdUsuarioCreador,
         IdCategoria = entity.IdCategoria,
-        IdPais = entity.IdPais,
+        IdUbicacion = entity.IdUbicacion,
         Nombre = entity.Nombre,
         Descripcion = entity.Descripcion,
-        Lugar = entity.Lugar,
         FechaInicio = entity.FechaInicio,
         FechaFin = entity.FechaFin,
         Horas = entity.Horas,
@@ -279,14 +280,12 @@ public static class MappingExtensions
 
     public static Actividad ToEntity(this ActividadCreateDto dto) => new()
     {
-        IdActividad = Guid.NewGuid(),
         IdOrganizacion = dto.IdOrganizacion,
         IdUsuarioCreador = dto.IdUsuarioCreador,
         IdCategoria = dto.IdCategoria,
-        IdPais = dto.IdPais,
+        IdUbicacion = dto.IdUbicacion,
         Nombre = dto.Nombre,
         Descripcion = dto.Descripcion,
-        Lugar = dto.Lugar,
         FechaInicio = dto.FechaInicio,
         FechaFin = dto.FechaFin,
         Horas = dto.Horas,
@@ -302,10 +301,9 @@ public static class MappingExtensions
         entity.IdOrganizacion = dto.IdOrganizacion;
         entity.IdUsuarioCreador = dto.IdUsuarioCreador;
         entity.IdCategoria = dto.IdCategoria;
-        entity.IdPais = dto.IdPais;
+        entity.IdUbicacion = dto.IdUbicacion;
         entity.Nombre = dto.Nombre;
         entity.Descripcion = dto.Descripcion;
-        entity.Lugar = dto.Lugar;
         entity.FechaInicio = dto.FechaInicio;
         entity.FechaFin = dto.FechaFin;
         entity.Horas = dto.Horas;
@@ -329,7 +327,6 @@ public static class MappingExtensions
 
     public static CoordinadorActividad ToEntity(this CoordinadorActividadCreateDto dto) => new()
     {
-        IdCoordinadorActividad = Guid.NewGuid(),
         IdOrganizacion = dto.IdOrganizacion,
         IdActividad = dto.IdActividad,
         IdUsuarioCoordinador = dto.IdUsuarioCoordinador,
@@ -358,6 +355,7 @@ public static class MappingExtensions
         HoraInicio = entity.HoraInicio,
         HoraFin = entity.HoraFin,
         Descripcion = entity.Descripcion,
+        Situacion = entity.Situacion,
         FechaDesde = entity.FechaDesde,
         FechaHasta = entity.FechaHasta,
         Estado = entity.Estado
@@ -365,7 +363,6 @@ public static class MappingExtensions
 
     public static HorarioActividad ToEntity(this HorarioActividadCreateDto dto) => new()
     {
-        IdHorarioActividad = Guid.NewGuid(),
         IdOrganizacion = dto.IdOrganizacion,
         IdActividad = dto.IdActividad,
         IdUsuario = dto.IdUsuario,
@@ -373,6 +370,7 @@ public static class MappingExtensions
         HoraInicio = dto.HoraInicio,
         HoraFin = dto.HoraFin,
         Descripcion = dto.Descripcion,
+        Situacion = dto.Situacion,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
         Estado = dto.Estado
@@ -387,6 +385,7 @@ public static class MappingExtensions
         entity.HoraInicio = dto.HoraInicio;
         entity.HoraFin = dto.HoraFin;
         entity.Descripcion = dto.Descripcion;
+        entity.Situacion = dto.Situacion;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
         entity.Estado = dto.Estado;
@@ -409,7 +408,6 @@ public static class MappingExtensions
 
     public static ParticipanteActividad ToEntity(this ParticipanteActividadCreateDto dto) => new()
     {
-        IdParticipanteActividad = Guid.NewGuid(),
         IdOrganizacion = dto.IdOrganizacion,
         IdActividad = dto.IdActividad,
         IdHorarioActividad = dto.IdHorarioActividad,
@@ -450,14 +448,17 @@ public static class MappingExtensions
         FechaUltimaAsistencia = entity.FechaUltimaAsistencia,
         Situacion = entity.Situacion,
         Observaciones = entity.Observaciones,
-        FechaRegistro = entity.FechaRegistro,
-        FechaModificacion = entity.FechaModificacion,
+        FechaEnvio = entity.FechaEnvio,
+        IntentosEnvio = entity.IntentosEnvio,
+        UltimoIntentoEnvio = entity.UltimoIntentoEnvio,
+        UltimoErrorEnvio = entity.UltimoErrorEnvio,
+        FechaDesde = entity.FechaDesde,
+        FechaHasta = entity.FechaHasta,
         Estado = entity.Estado
     };
 
     public static CertificadoParticipacion ToEntity(this CertificacionParticipacionCreateDto dto) => new()
     {
-        IdCertificacion = Guid.NewGuid(),
         IdParticipanteActividad = dto.IdParticipanteActividad,
         IdActividad = dto.IdActividad,
         IdOrganizacion = dto.IdOrganizacion,
@@ -469,8 +470,12 @@ public static class MappingExtensions
         FechaUltimaAsistencia = dto.FechaUltimaAsistencia,
         Situacion = dto.Situacion,
         Observaciones = dto.Observaciones,
-        FechaRegistro = dto.FechaRegistro ?? DateTime.UtcNow,
-        FechaModificacion = dto.FechaModificacion,
+        FechaEnvio = dto.FechaEnvio,
+        IntentosEnvio = dto.IntentosEnvio,
+        UltimoIntentoEnvio = dto.UltimoIntentoEnvio,
+        UltimoErrorEnvio = dto.UltimoErrorEnvio,
+        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+        FechaHasta = dto.FechaHasta,
         Estado = dto.Estado
     };
 
@@ -487,8 +492,12 @@ public static class MappingExtensions
         entity.FechaUltimaAsistencia = dto.FechaUltimaAsistencia;
         entity.Situacion = dto.Situacion;
         entity.Observaciones = dto.Observaciones;
-        entity.FechaRegistro = dto.FechaRegistro ?? entity.FechaRegistro;
-        entity.FechaModificacion = dto.FechaModificacion ?? DateTime.UtcNow;
+        entity.FechaEnvio = dto.FechaEnvio;
+        entity.IntentosEnvio = dto.IntentosEnvio;
+        entity.UltimoIntentoEnvio = dto.UltimoIntentoEnvio;
+        entity.UltimoErrorEnvio = dto.UltimoErrorEnvio;
+        entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
+        entity.FechaHasta = dto.FechaHasta;
         entity.Estado = dto.Estado;
     }
 }

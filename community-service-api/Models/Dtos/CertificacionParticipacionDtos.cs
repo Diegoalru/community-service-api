@@ -6,35 +6,57 @@ namespace community_service_api.Models.Dtos;
 public class CertificacionParticipacionDto
 {
     public Guid IdCertificacion { get; set; }
-    public Guid IdParticipanteActividad { get; set; }
-    public Guid IdActividad { get; set; }
-    public Guid IdOrganizacion { get; set; }
-    public Guid IdUsuarioVoluntario { get; set; }
+
+    public int IdParticipanteActividad { get; set; }
+
+    public int IdActividad { get; set; }
+
+    public int IdOrganizacion { get; set; }
+
+    public int IdUsuarioVoluntario { get; set; }
+
     public DateTime FechaEmision { get; set; }
+
     public int HorasTotales { get; set; }
+
     public int DiasTotales { get; set; }
+
     public DateTime FechaPrimeraAsistencia { get; set; }
+
     public DateTime FechaUltimaAsistencia { get; set; }
+
     public char Situacion { get; set; }
+
     public string? Observaciones { get; set; }
-    public DateTime FechaRegistro { get; set; }
-    public DateTime? FechaModificacion { get; set; }
+
+    public DateTime? FechaEnvio { get; set; }
+
+    public int? IntentosEnvio { get; set; }
+
+    public DateTime? UltimoIntentoEnvio { get; set; }
+
+    public string? UltimoErrorEnvio { get; set; }
+
+    public DateTime FechaDesde { get; set; }
+
+    public DateTime? FechaHasta { get; set; }
+
     public char Estado { get; set; }
 }
 
 public class CertificacionParticipacionCreateDto
 {
     [Required]
-    public Guid IdParticipanteActividad { get; set; }
+    public int IdParticipanteActividad { get; set; }
 
     [Required]
-    public Guid IdActividad { get; set; }
+    public int IdActividad { get; set; }
 
     [Required]
-    public Guid IdOrganizacion { get; set; }
+    public int IdOrganizacion { get; set; }
 
     [Required]
-    public Guid IdUsuarioVoluntario { get; set; }
+    public int IdUsuarioVoluntario { get; set; }
 
     [Required]
     public DateTime FechaEmision { get; set; }
@@ -58,8 +80,18 @@ public class CertificacionParticipacionCreateDto
     [MaxLength(500)]
     public string? Observaciones { get; set; }
 
-    public DateTime? FechaRegistro { get; set; }
-    public DateTime? FechaModificacion { get; set; }
+    public DateTime? FechaEnvio { get; set; }
+
+    public int? IntentosEnvio { get; set; }
+
+    public DateTime? UltimoIntentoEnvio { get; set; }
+
+    [MaxLength(2000)]
+    public string? UltimoErrorEnvio { get; set; }
+
+    public DateTime? FechaDesde { get; set; }
+
+    public DateTime? FechaHasta { get; set; }
 
     [Required]
     [RegularExpression("[AI]")]

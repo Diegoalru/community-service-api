@@ -46,8 +46,8 @@ public class UsuariosController(IUsuarioService usuarioService) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = newUserId }, newUser);
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UsuarioUpdateDto dto)
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UsuarioUpdateDto dto)
     {
         var updated = await usuarioService.UpdateAsync(id, dto);
         if (!updated)
@@ -58,8 +58,8 @@ public class UsuariosController(IUsuarioService usuarioService) : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
     {
         var deleted = await usuarioService.DeleteAsync(id);
         if (!deleted)
