@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace community_service_api.Models.DBTableEntities;
@@ -13,21 +13,17 @@ public partial class Actividad
 
     public int IdCategoria { get; set; }
 
-    public int IdPais { get; set; }
-
     public int IdUbicacion { get; set; }
 
     public string Nombre { get; set; } = null!;
 
     public string Descripcion { get; set; } = null!;
 
-    public string Lugar { get; set; } = null!;
+    public DateTime? FechaInicio { get; set; }
 
-    public DateTime FechaInicio { get; set; }
+    public DateTime? FechaFin { get; set; }
 
-    public DateTime FechaFin { get; set; }
-
-    public int Horas { get; set; }
+    public int? Horas { get; set; }
 
     public int Cupos { get; set; }
 
@@ -48,8 +44,6 @@ public partial class Actividad
     public virtual CategoriaActividad IdCategoriaNavigation { get; set; } = null!;
 
     public virtual Organizacion IdOrganizacionNavigation { get; set; } = null!;
-
-    public virtual Pais IdPaisNavigation { get; set; } = null!;
 
     public virtual Ubicacion IdUbicacionNavigation { get; set; } = null!;
 

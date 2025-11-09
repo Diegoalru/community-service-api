@@ -12,10 +12,10 @@ namespace community_service_api.Services;
 public interface IPerfilService
 {
     Task<IEnumerable<PerfilDto>> GetAllAsync();
-    Task<PerfilDto?> GetByIdAsync(Guid id);
+    Task<PerfilDto?> GetByIdAsync(int id);
     Task<PerfilDto> CreateAsync(PerfilCreateDto dto);
-    Task<bool> UpdateAsync(Guid id, PerfilUpdateDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<bool> UpdateAsync(int id, PerfilUpdateDto dto);
+    Task<bool> DeleteAsync(int id);
 }
 
 public class PerfilService : IPerfilService
@@ -33,7 +33,7 @@ public class PerfilService : IPerfilService
         return entities.Select(e => e.ToDto());
     }
 
-    public async Task<PerfilDto?> GetByIdAsync(Guid id)
+    public async Task<PerfilDto?> GetByIdAsync(int id)
     {
         var entity = await _repository.GetByIdAsync(id);
         return entity?.ToDto();
@@ -46,7 +46,7 @@ public class PerfilService : IPerfilService
         return created.ToDto();
     }
 
-    public async Task<bool> UpdateAsync(Guid id, PerfilUpdateDto dto)
+    public async Task<bool> UpdateAsync(int id, PerfilUpdateDto dto)
     {
         var entity = await _repository.GetByIdAsync(id);
         if (entity is null)
@@ -59,7 +59,7 @@ public class PerfilService : IPerfilService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(int id)
     {
         return await _repository.DeleteAsync(id);
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 
 namespace community_service_api.Models.DBTableEntities;
 
@@ -34,6 +33,10 @@ public partial class CertificadoParticipacion
     public DateTime? FechaEnvio { get; set; }
 
     public int? IntentosEnvio { get; set; }
+
+    public DateTime? UltimoIntentoEnvio { get; set; }
+
+    public string? UltimoErrorEnvio { get; set; }
 
     public DateTime FechaDesde { get; set; }
 

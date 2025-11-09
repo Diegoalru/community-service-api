@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace community_service_api.Models.DBTableEntities;
@@ -15,11 +15,13 @@ public partial class HorarioActividad
 
     public DateTime Fecha { get; set; }
 
-    public TimeSpan HoraInicio { get; set; }
+    public DateTime HoraInicio { get; set; }
 
-    public TimeSpan HoraFin { get; set; }
+    public DateTime HoraFin { get; set; }
 
     public string? Descripcion { get; set; }
+
+    public string Situacion { get; set; } = null!;
 
     public DateTime FechaDesde { get; set; }
 

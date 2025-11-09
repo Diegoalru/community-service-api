@@ -12,10 +12,10 @@ namespace community_service_api.Services;
 public interface IHorarioActividadService
 {
     Task<IEnumerable<HorarioActividadDto>> GetAllAsync();
-    Task<HorarioActividadDto?> GetByIdAsync(Guid id);
+    Task<HorarioActividadDto?> GetByIdAsync(int id);
     Task<HorarioActividadDto> CreateAsync(HorarioActividadCreateDto dto);
-    Task<bool> UpdateAsync(Guid id, HorarioActividadUpdateDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<bool> UpdateAsync(int id, HorarioActividadUpdateDto dto);
+    Task<bool> DeleteAsync(int id);
 }
 
 public class HorarioActividadService : IHorarioActividadService
@@ -33,7 +33,7 @@ public class HorarioActividadService : IHorarioActividadService
         return entities.Select(e => e.ToDto());
     }
 
-    public async Task<HorarioActividadDto?> GetByIdAsync(Guid id)
+    public async Task<HorarioActividadDto?> GetByIdAsync(int id)
     {
         var entity = await _repository.GetByIdAsync(id);
         return entity?.ToDto();
@@ -46,7 +46,7 @@ public class HorarioActividadService : IHorarioActividadService
         return created.ToDto();
     }
 
-    public async Task<bool> UpdateAsync(Guid id, HorarioActividadUpdateDto dto)
+    public async Task<bool> UpdateAsync(int id, HorarioActividadUpdateDto dto)
     {
         var entity = await _repository.GetByIdAsync(id);
         if (entity is null)
@@ -59,7 +59,7 @@ public class HorarioActividadService : IHorarioActividadService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(int id)
     {
         return await _repository.DeleteAsync(id);
     }

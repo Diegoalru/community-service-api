@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 
 namespace community_service_api.Models.DBTableEntities;
 
@@ -9,13 +8,15 @@ public partial class ControlProceso
 
     public int TipoControl { get; set; }
 
-    public DateTime FechaEjecucion { get; set; }
+    public DateTime InicioEjecucion { get; set; }
 
-    public int ActividadesProcesadas { get; set; }
+    public DateTime FinEjecucion { get; set; }
 
-    public int CertificadosGenerados { get; set; }
+    public int? ActividadesProcesadas { get; set; }
 
-    public int CorreosEnviados { get; set; }
+    public int? CertificadosGenerados { get; set; }
+
+    public int? CorreosEnviados { get; set; }
 
     public string Estado { get; set; } = null!;
 
