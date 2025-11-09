@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using community_service_api.Helpers;
+using community_service_api.Models.DBTableEntities;
 using community_service_api.Models.Dtos;
-using community_service_api.Models.Entities;
 using community_service_api.Repositories;
 
 namespace community_service_api.Services;

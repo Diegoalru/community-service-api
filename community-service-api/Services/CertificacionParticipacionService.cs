@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using community_service_api.Helpers;
+using community_service_api.Models.DBTableEntities;
 using community_service_api.Models.Dtos;
-using community_service_api.Models.Entities;
 using community_service_api.Repositories;
 
 namespace community_service_api.Services;
@@ -20,9 +16,9 @@ public interface ICertificacionParticipacionService
 
 public class CertificacionParticipacionService : ICertificacionParticipacionService
 {
-    private readonly IRepository<CertificacionParticipacion> _repository;
+    private readonly IRepository<CertificadoParticipacion> _repository;
 
-    public CertificacionParticipacionService(IRepository<CertificacionParticipacion> repository)
+    public CertificacionParticipacionService(IRepository<CertificadoParticipacion> repository)
     {
         _repository = repository;
     }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using community_service_api.Models.NewEntities;
+﻿using Microsoft.EntityFrameworkCore;
+using community_service_api.Models.DBTableEntities;
 
 namespace community_service_api.DbContext;
 

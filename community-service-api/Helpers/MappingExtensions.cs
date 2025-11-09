@@ -1,6 +1,5 @@
-using System;
+using community_service_api.Models.DBTableEntities;
 using community_service_api.Models.Dtos;
-using community_service_api.Models.Entities;
 
 namespace community_service_api.Helpers;
 
@@ -437,7 +436,7 @@ public static class MappingExtensions
         entity.Estado = dto.Estado;
     }
 
-    public static CertificacionParticipacionDto ToDto(this CertificacionParticipacion entity) => new()
+    public static CertificacionParticipacionDto ToDto(this CertificadoParticipacion entity) => new()
     {
         IdCertificacion = entity.IdCertificacion,
         IdParticipanteActividad = entity.IdParticipanteActividad,
@@ -456,7 +455,7 @@ public static class MappingExtensions
         Estado = entity.Estado
     };
 
-    public static CertificacionParticipacion ToEntity(this CertificacionParticipacionCreateDto dto) => new()
+    public static CertificadoParticipacion ToEntity(this CertificacionParticipacionCreateDto dto) => new()
     {
         IdCertificacion = Guid.NewGuid(),
         IdParticipanteActividad = dto.IdParticipanteActividad,
@@ -475,7 +474,7 @@ public static class MappingExtensions
         Estado = dto.Estado
     };
 
-    public static void UpdateFromDto(this CertificacionParticipacion entity, CertificacionParticipacionUpdateDto dto)
+    public static void UpdateFromDto(this CertificadoParticipacion entity, CertificacionParticipacionUpdateDto dto)
     {
         entity.IdParticipanteActividad = dto.IdParticipanteActividad;
         entity.IdActividad = dto.IdActividad;

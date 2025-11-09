@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace community_service_api.Models.NewEntities;
+namespace community_service_api.Models.DBTableEntities;
 
 public partial class Pais
 {
