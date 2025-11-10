@@ -7,12 +7,6 @@ public class PerfilDto
 {
     public int IdPerfil { get; set; }
 
-    public int IdUsuario { get; set; }
-
-    public int IdUbicacion { get; set; }
-
-    public int IdIdentificador { get; set; }
-
     public string Identificacion { get; set; } = string.Empty;
 
     public string Nombre { get; set; } = string.Empty;
@@ -24,10 +18,6 @@ public class PerfilDto
     public DateTime FechaNacimiento { get; set; }
 
     public string? Bibliografia { get; set; }
-
-    public DateTime FechaDesde { get; set; }
-
-    public DateTime? FechaHasta { get; set; }
 
     public char Estado { get; set; }
 }

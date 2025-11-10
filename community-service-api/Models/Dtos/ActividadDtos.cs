@@ -7,14 +7,6 @@ public class ActividadDto
 {
     public int IdActividad { get; set; }
 
-    public int IdOrganizacion { get; set; }
-
-    public int IdUsuarioCreador { get; set; }
-
-    public int IdCategoria { get; set; }
-
-    public int IdUbicacion { get; set; }
-
     public string Nombre { get; set; } = string.Empty;
 
     public string Descripcion { get; set; } = string.Empty;
@@ -28,10 +20,6 @@ public class ActividadDto
     public int Cupos { get; set; }
 
     public char Situacion { get; set; }
-
-    public DateTime FechaDesde { get; set; }
-
-    public DateTime? FechaHasta { get; set; }
 
     public char Estado { get; set; }
 }

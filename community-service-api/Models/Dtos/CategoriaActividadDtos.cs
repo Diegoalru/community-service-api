@@ -9,10 +9,6 @@ public class CategoriaActividadDto
 
     public string Nombre { get; set; } = string.Empty;
 
-    public DateTime FechaDesde { get; set; }
-
-    public DateTime? FechaHasta { get; set; }
-
     public char Estado { get; set; }
 }
 

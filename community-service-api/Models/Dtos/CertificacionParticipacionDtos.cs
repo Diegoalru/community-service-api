@@ -7,14 +7,6 @@ public class CertificacionParticipacionDto
 {
     public Guid IdCertificacion { get; set; }
 
-    public int IdParticipanteActividad { get; set; }
-
-    public int IdActividad { get; set; }
-
-    public int IdOrganizacion { get; set; }
-
-    public int IdUsuarioVoluntario { get; set; }
-
     public DateTime FechaEmision { get; set; }
 
     public int HorasTotales { get; set; }
@@ -36,10 +28,6 @@ public class CertificacionParticipacionDto
     public DateTime? UltimoIntentoEnvio { get; set; }
 
     public string? UltimoErrorEnvio { get; set; }
-
-    public DateTime FechaDesde { get; set; }
-
-    public DateTime? FechaHasta { get; set; }
 
     public char Estado { get; set; }
 }
