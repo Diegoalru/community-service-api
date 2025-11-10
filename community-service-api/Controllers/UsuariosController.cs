@@ -8,26 +8,19 @@ namespace community_service_api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsuariosController : ControllerBase
+public class UsuariosController(IUsuarioService usuarioService) : ControllerBase
 {
-    private readonly IUsuarioService _usuarioService;
-
-    public UsuariosController(IUsuarioService usuarioService)
-    {
-        _usuarioService = usuarioService;
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var usuarios = await _usuarioService.GetAllAsync();
+        var usuarios = await usuarioService.GetAllAsync();
         return Ok(usuarios);
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id)
     {
-        var usuario = await _usuarioService.GetByIdAsync(id);
+        var usuario = await usuarioService.GetByIdAsync(id);
         if (usuario is null)
         {
             return NotFound();
@@ -39,14 +32,24 @@ public class UsuariosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] UsuarioCreateDto dto)
     {
-        var created = await _usuarioService.CreateAsync(dto);
+        var created = await usuarioService.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = created.IdUsuario }, created);
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UsuarioUpdateDto dto)
+    [HttpPost("CreateUser")]
+    public async Task<IActionResult> CreateWithProcedure([FromBody] UsuarioCreateDtoTest dto)
     {
-        var updated = await _usuarioService.UpdateAsync(id, dto);
+        var newUserId = await usuarioService.CreateUsuarioWithProcedureAsync(dto);
+        
+        var newUser = await usuarioService.GetByIdAsync(newUserId);
+
+        return CreatedAtAction(nameof(GetById), new { id = newUserId }, newUser);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UsuarioUpdateDto dto)
+    {
+        var updated = await usuarioService.UpdateAsync(id, dto);
         if (!updated)
         {
             return NotFound();
@@ -55,10 +58,10 @@ public class UsuariosController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await _usuarioService.DeleteAsync(id);
+        var deleted = await usuarioService.DeleteAsync(id);
         if (!deleted)
         {
             return NotFound();

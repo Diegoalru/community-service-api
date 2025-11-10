@@ -5,31 +5,27 @@ namespace community_service_api.Models.Dtos;
 
 public class RolUsuarioOrganizacionDto
 {
-    public Guid IdRolUsuarioOrganizacion { get; set; }
-    public Guid IdOrganizacion { get; set; }
-    public Guid IdUsuarioAsignado { get; set; }
-    public Guid IdUsuarioAdministrador { get; set; }
-    public int IdRol { get; set; }
-    public DateTime FechaDesde { get; set; }
-    public DateTime? FechaHasta { get; set; }
+    public int IdRolUsuarioOrganizacion { get; set; }
+
     public char Estado { get; set; }
 }
 
 public class RolUsuarioOrganizacionCreateDto
 {
     [Required]
-    public Guid IdOrganizacion { get; set; }
+    public int IdOrganizacion { get; set; }
 
     [Required]
-    public Guid IdUsuarioAsignado { get; set; }
+    public int IdUsuarioAsignado { get; set; }
 
     [Required]
-    public Guid IdUsuarioAdministrador { get; set; }
+    public int IdUsuarioAdministrador { get; set; }
 
     [Required]
     public int IdRol { get; set; }
 
     public DateTime? FechaDesde { get; set; }
+
     public DateTime? FechaHasta { get; set; }
 
     [Required]

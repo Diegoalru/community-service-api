@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using community_service_api.Helpers;
+using community_service_api.Models.DBTableEntities;
 using community_service_api.Models.Dtos;
-using community_service_api.Models.Entities;
 using community_service_api.Repositories;
 
 namespace community_service_api.Services;
@@ -12,10 +12,10 @@ namespace community_service_api.Services;
 public interface ICoordinadorActividadService
 {
     Task<IEnumerable<CoordinadorActividadDto>> GetAllAsync();
-    Task<CoordinadorActividadDto?> GetByIdAsync(Guid id);
+    Task<CoordinadorActividadDto?> GetByIdAsync(int id);
     Task<CoordinadorActividadDto> CreateAsync(CoordinadorActividadCreateDto dto);
-    Task<bool> UpdateAsync(Guid id, CoordinadorActividadUpdateDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<bool> UpdateAsync(int id, CoordinadorActividadUpdateDto dto);
+    Task<bool> DeleteAsync(int id);
 }
 
 public class CoordinadorActividadService : ICoordinadorActividadService
@@ -33,7 +33,7 @@ public class CoordinadorActividadService : ICoordinadorActividadService
         return entities.Select(e => e.ToDto());
     }
 
-    public async Task<CoordinadorActividadDto?> GetByIdAsync(Guid id)
+    public async Task<CoordinadorActividadDto?> GetByIdAsync(int id)
     {
         var entity = await _repository.GetByIdAsync(id);
         return entity?.ToDto();
@@ -46,7 +46,7 @@ public class CoordinadorActividadService : ICoordinadorActividadService
         return created.ToDto();
     }
 
-    public async Task<bool> UpdateAsync(Guid id, CoordinadorActividadUpdateDto dto)
+    public async Task<bool> UpdateAsync(int id, CoordinadorActividadUpdateDto dto)
     {
         var entity = await _repository.GetByIdAsync(id);
         if (entity is null)
@@ -59,7 +59,7 @@ public class CoordinadorActividadService : ICoordinadorActividadService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(int id)
     {
         return await _repository.DeleteAsync(id);
     }
