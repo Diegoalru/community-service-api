@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace community_service_api.Repositories;
 
-public class GenericRepository<TEntity>(ApplicationDbContext context) : IRepository<TEntity>
+public class GenericRepository<TEntity>(NewApplicationDbContext context) : IRepository<TEntity>
     where TEntity : class
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();

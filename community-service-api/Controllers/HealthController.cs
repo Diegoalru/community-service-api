@@ -5,7 +5,7 @@ namespace community_service_api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class HealthController(ApplicationDbContext context) : ControllerBase
+public class HealthController(NewApplicationDbContext context) : ControllerBase
 {
     [HttpGet("CheckDatabaseConnection")]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using community_service_api.Helpers;
 using community_service_api.Models.Dtos;
-using community_service_api.Models.Entities;
+using community_service_api.Models.DBTableEntities;
 using community_service_api.Repositories;
 using Dapper.Oracle;
 
@@ -16,8 +16,8 @@ public interface IUsuarioService
     Task<IEnumerable<UsuarioDto>> GetAllAsync();
     Task<UsuarioDto?> GetByIdAsync(int id);
     Task<UsuarioDto> CreateAsync(UsuarioCreateDto dto);
-    Task<bool> UpdateAsync(Guid id, UsuarioUpdateDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<bool> UpdateAsync(int id, UsuarioUpdateDto dto);
+    Task<bool> DeleteAsync(int id);
     Task<int> CreateUsuarioWithProcedureAsync(UsuarioCreateDtoTest dto);
 }
 
@@ -43,7 +43,7 @@ public class UsuarioService(IRepository<Usuario> repository, IProcedureRepositor
         return created.ToDto();
     }
 
-    public async Task<bool> UpdateAsync(Guid id, UsuarioUpdateDto dto)
+    public async Task<bool> UpdateAsync(int id, UsuarioUpdateDto dto)
     {
         var entity = await repository.GetByIdAsync(id);
         if (entity is null)
@@ -56,7 +56,7 @@ public class UsuarioService(IRepository<Usuario> repository, IProcedureRepositor
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(int id)
     {
         return await repository.DeleteAsync(id);
     }
@@ -68,7 +68,7 @@ public class UsuarioService(IRepository<Usuario> repository, IProcedureRepositor
         try
         {
             var dyParam = new OracleDynamicParameters();
-            dyParam.Add("PV_USERNAME", dto.Usuario, OracleMappingType.Varchar2, ParameterDirection.Input);
+            dyParam.Add("PV_USERNAME", dto.Username, OracleMappingType.Varchar2, ParameterDirection.Input);
             dyParam.Add("PV_PASSWORD", dto.Password, OracleMappingType.Varchar2, ParameterDirection.Input);
             dyParam.Add("PV_ID_USUARIO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
 

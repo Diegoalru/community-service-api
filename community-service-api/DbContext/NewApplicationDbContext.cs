@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using community_service_api.Models.NewEntities;
+using community_service_api.Models.DBTableEntities;
 
 namespace community_service_api.DbContext;
 
@@ -95,7 +93,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP        ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaFin)
                 .HasPrecision(6)
@@ -115,19 +113,12 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
             entity.Property(e => e.IdOrganizacion)
                 .HasPrecision(10)
                 .HasColumnName("ID_ORGANIZACION");
-            entity.Property(e => e.IdPais)
-                .HasPrecision(10)
-                .HasColumnName("ID_PAIS");
             entity.Property(e => e.IdUbicacion)
                 .HasPrecision(10)
                 .HasColumnName("ID_UBICACION");
             entity.Property(e => e.IdUsuarioCreador)
                 .HasPrecision(10)
                 .HasColumnName("ID_USUARIO_CREADOR");
-            entity.Property(e => e.Lugar)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("LUGAR");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -147,11 +138,6 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasForeignKey(d => d.IdOrganizacion)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACT_ORG");
-
-            entity.HasOne(d => d.IdPaisNavigation).WithMany(p => p.Actividad)
-                .HasForeignKey(d => d.IdPais)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ACT_PAIS");
 
             entity.HasOne(d => d.IdUbicacionNavigation).WithMany(p => p.Actividad)
                 .HasForeignKey(d => d.IdUbicacion)
@@ -188,6 +174,18 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasMaxLength(2)
                 .IsUnicode(false)
                 .HasColumnName("CODIGO");
+            entity.Property(e => e.Estado)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ESTADO");
+            entity.Property(e => e.FechaDesde)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("FECHA_DESDE");
+            entity.Property(e => e.FechaHasta)
+                .HasPrecision(6)
+                .HasColumnName("FECHA_HASTA");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -214,6 +212,13 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("ESTADO");
+            entity.Property(e => e.FechaDesde)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("FECHA_DESDE");
+            entity.Property(e => e.FechaHasta)
+                .HasPrecision(6)
+                .HasColumnName("FECHA_HASTA");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -229,7 +234,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
             entity.HasIndex(e => new { e.IdParticipanteActividad, e.IdActividad, e.IdUsuarioVoluntario }, "UQ_CERT_PART").IsUnique();
 
             entity.Property(e => e.IdCertificacion)
-                .HasDefaultValueSql("SYS_GUID()     ")
+                .HasDefaultValueSql("SYS_GUID()")
                 .HasColumnName("ID_CERTIFICACION");
             entity.Property(e => e.DiasTotales)
                 .HasPrecision(10)
@@ -240,12 +245,12 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
             entity.Property(e => e.Estado)
                 .HasMaxLength(1)
                 .IsUnicode(false)
-                .HasDefaultValueSql("'A'            ")
+                .HasDefaultValueSql("'A'")
                 .IsFixedLength()
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaEmision)
                 .HasPrecision(6)
@@ -289,6 +294,13 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("SITUACION");
+            entity.Property(e => e.UltimoErrorEnvio)
+                .HasMaxLength(2000)
+                .IsUnicode(false)
+                .HasColumnName("ULTIMO_ERROR_ENVIO");
+            entity.Property(e => e.UltimoIntentoEnvio)
+                .HasPrecision(6)
+                .HasColumnName("ULTIMO_INTENTO_ENVIO");
 
             entity.HasOne(d => d.IdUsuarioVoluntarioNavigation).WithMany(p => p.CertificadoParticipacion)
                 .HasForeignKey(d => d.IdUsuarioVoluntario)
@@ -311,7 +323,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
         {
             entity.HasKey(e => e.IdControl).HasName("PK_CONTROL");
 
-            entity.ToTable("CONTROL_PROCESO");
+            entity.ToTable("CONTROL_PROCESO_GENERACION_CER");
 
             entity.Property(e => e.IdControl)
                 .HasPrecision(10)
@@ -319,15 +331,15 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ID_CONTROL");
             entity.Property(e => e.ActividadesProcesadas)
                 .HasPrecision(10)
-                .HasDefaultValueSql("0                           ")
+                .HasDefaultValueSql("0")
                 .HasColumnName("ACTIVIDADES_PROCESADAS");
             entity.Property(e => e.CertificadosGenerados)
                 .HasPrecision(10)
-                .HasDefaultValueSql("0                           ")
+                .HasDefaultValueSql("0")
                 .HasColumnName("CERTIFICADOS_GENERADOS");
             entity.Property(e => e.CorreosEnviados)
                 .HasPrecision(10)
-                .HasDefaultValueSql("0                           ")
+                .HasDefaultValueSql("0")
                 .HasColumnName("CORREOS_ENVIADOS");
             entity.Property(e => e.ErrorMensaje)
                 .HasMaxLength(2000)
@@ -336,13 +348,16 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
             entity.Property(e => e.Estado)
                 .HasMaxLength(1)
                 .IsUnicode(false)
-                .HasDefaultValueSql("'C'                         ")
+                .HasDefaultValueSql("'S'")
                 .IsFixedLength()
                 .HasColumnName("ESTADO");
-            entity.Property(e => e.FechaEjecucion)
+            entity.Property(e => e.FinEjecucion)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP              ")
-                .HasColumnName("FECHA_EJECUCION");
+                .HasColumnName("FIN_EJECUCION");
+            entity.Property(e => e.InicioEjecucion)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("INICIO_EJECUCION");
             entity.Property(e => e.TipoControl)
                 .HasPrecision(10)
                 .HasColumnName("TIPO_CONTROL");
@@ -376,7 +391,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP                    ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
@@ -424,7 +439,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP              ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
@@ -478,6 +493,18 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasMaxLength(2)
                 .IsUnicode(false)
                 .HasColumnName("CODIGO");
+            entity.Property(e => e.Estado)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ESTADO");
+            entity.Property(e => e.FechaDesde)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("FECHA_DESDE");
+            entity.Property(e => e.FechaHasta)
+                .HasPrecision(6)
+                .HasColumnName("FECHA_HASTA");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -519,20 +546,25 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("FECHA");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP                ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
                 .HasColumnName("FECHA_HASTA");
             entity.Property(e => e.HoraFin)
-                .HasColumnType("INTERVAL DAY(2) TO SECOND(6)")
+                .HasPrecision(6)
                 .HasColumnName("HORA_FIN");
             entity.Property(e => e.HoraInicio)
-                .HasColumnType("INTERVAL DAY(2) TO SECOND(6)")
+                .HasPrecision(6)
                 .HasColumnName("HORA_INICIO");
             entity.Property(e => e.IdUsuario)
                 .HasPrecision(10)
                 .HasColumnName("ID_USUARIO");
+            entity.Property(e => e.Situacion)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("SITUACION");
 
             entity.HasOne(d => d.IdOrganizacionNavigation).WithMany(p => p.HorarioActividad)
                 .HasForeignKey(d => d.IdOrganizacion)
@@ -574,7 +606,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("CODIGO");
             entity.Property(e => e.Fecha)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP        ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA");
             entity.Property(e => e.Linea)
                 .HasPrecision(10)
@@ -594,7 +626,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
             entity.Property(e => e.Usuario)
                 .HasMaxLength(30)
                 .IsUnicode(false)
-                .HasDefaultValueSql("USER                  ")
+                .HasDefaultValueSql("USER")
                 .HasColumnName("USUARIO");
         });
 
@@ -608,18 +640,10 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasPrecision(10)
                 .HasDefaultValueSql("\"COMMUNITY\".\"SEQ_ORGANIZACION\".\"NEXTVAL\"")
                 .HasColumnName("ID_ORGANIZACION");
-            entity.Property(e => e.Ciudad)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("CIUDAD");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("DESCRIPCION");
-            entity.Property(e => e.Direccion)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("DIRECCION");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
                 .IsUnicode(false)
@@ -631,14 +655,11 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP           ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
                 .HasColumnName("FECHA_HASTA");
-            entity.Property(e => e.IdPais)
-                .HasPrecision(10)
-                .HasColumnName("ID_PAIS");
             entity.Property(e => e.IdUbicacion)
                 .HasPrecision(10)
                 .HasColumnName("ID_UBICACION");
@@ -657,11 +678,6 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasColumnName("TELEFONO");
-
-            entity.HasOne(d => d.IdPaisNavigation).WithMany(p => p.Organizacion)
-                .HasForeignKey(d => d.IdPais)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ORG_PAIS");
 
             entity.HasOne(d => d.IdUbicacionNavigation).WithMany(p => p.Organizacion)
                 .HasForeignKey(d => d.IdUbicacion)
@@ -691,6 +707,13 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("ESTADO");
+            entity.Property(e => e.FechaDesde)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("FECHA_DESDE");
+            entity.Property(e => e.FechaHasta)
+                .HasPrecision(6)
+                .HasColumnName("FECHA_HASTA");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -720,7 +743,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP                     ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
@@ -789,10 +812,6 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasMaxLength(2000)
                 .IsUnicode(false)
                 .HasColumnName("BIBLIOGRAFIA");
-            entity.Property(e => e.Direccion)
-                .HasMaxLength(200)
-                .IsUnicode(false)
-                .HasColumnName("DIRECCION");
             entity.Property(e => e.Estado)
                 .HasMaxLength(1)
                 .IsUnicode(false)
@@ -800,7 +819,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP     ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
@@ -811,15 +830,16 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
             entity.Property(e => e.IdIdentificador)
                 .HasPrecision(10)
                 .HasColumnName("ID_IDENTIFICADOR");
-            entity.Property(e => e.IdPais)
-                .HasPrecision(10)
-                .HasColumnName("ID_PAIS");
             entity.Property(e => e.IdUbicacion)
                 .HasPrecision(10)
                 .HasColumnName("ID_UBICACION");
             entity.Property(e => e.IdUsuario)
                 .HasPrecision(10)
                 .HasColumnName("ID_USUARIO");
+            entity.Property(e => e.Identificacion)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("IDENTIFICACION");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -829,11 +849,6 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasForeignKey(d => d.IdIdentificador)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PERFIL_IDENT");
-
-            entity.HasOne(d => d.IdPaisNavigation).WithMany(p => p.Perfil)
-                .HasForeignKey(d => d.IdPais)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PERFIL_PAIS");
 
             entity.HasOne(d => d.IdUbicacionNavigation).WithMany(p => p.Perfil)
                 .HasForeignKey(d => d.IdUbicacion)
@@ -867,6 +882,18 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasMaxLength(2)
                 .IsUnicode(false)
                 .HasColumnName("CODIGO");
+            entity.Property(e => e.Estado)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ESTADO");
+            entity.Property(e => e.FechaDesde)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("FECHA_DESDE");
+            entity.Property(e => e.FechaHasta)
+                .HasPrecision(6)
+                .HasColumnName("FECHA_HASTA");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -893,6 +920,13 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("ESTADO");
+            entity.Property(e => e.FechaDesde)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("FECHA_DESDE");
+            entity.Property(e => e.FechaHasta)
+                .HasPrecision(6)
+                .HasColumnName("FECHA_HASTA");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -927,7 +961,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP                       ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
@@ -997,6 +1031,13 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("ESTADO");
+            entity.Property(e => e.FechaDesde)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("FECHA_DESDE");
+            entity.Property(e => e.FechaHasta)
+                .HasPrecision(6)
+                .HasColumnName("FECHA_HASTA");
         });
 
         modelBuilder.Entity<TipoIdentificador>(entity =>
@@ -1018,6 +1059,13 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("ESTADO");
+            entity.Property(e => e.FechaDesde)
+                .HasPrecision(6)
+                .HasDefaultValueSql("LOCALTIMESTAMP")
+                .HasColumnName("FECHA_DESDE");
+            entity.Property(e => e.FechaHasta)
+                .HasPrecision(6)
+                .HasColumnName("FECHA_HASTA");
         });
 
         modelBuilder.Entity<Ubicacion>(entity =>
@@ -1041,12 +1089,12 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
             entity.Property(e => e.Estado)
                 .HasMaxLength(1)
                 .IsUnicode(false)
-                .HasDefaultValueSql("'A'                   ")
+                .HasDefaultValueSql("'A'")
                 .IsFixedLength()
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP        ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
@@ -1072,7 +1120,6 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
 
             entity.HasOne(d => d.Distrito).WithMany(p => p.Ubicacion)
                 .HasForeignKey(d => new { d.IdPais, d.IdProvincia, d.IdCanton, d.IdDistrito })
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UBIC_DISTRITO");
         });
 
@@ -1082,7 +1129,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
 
             entity.ToTable("USUARIO");
 
-            entity.HasIndex(e => e.Usuario1, "UQ_USUARIO_USUARIO").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ_USUARIO_USUARIO").IsUnique();
 
             entity.Property(e => e.IdUsuario)
                 .HasPrecision(10)
@@ -1095,7 +1142,7 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasColumnName("ESTADO");
             entity.Property(e => e.FechaDesde)
                 .HasPrecision(6)
-                .HasDefaultValueSql("LOCALTIMESTAMP      ")
+                .HasDefaultValueSql("LOCALTIMESTAMP")
                 .HasColumnName("FECHA_DESDE");
             entity.Property(e => e.FechaHasta)
                 .HasPrecision(6)
@@ -1104,11 +1151,12 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("PASSWORD");
-            entity.Property(e => e.Usuario1)
+            entity.Property(e => e.Username)
                 .HasMaxLength(200)
                 .IsUnicode(false)
-                .HasColumnName("USUARIO");
+                .HasColumnName("USERNAME");
         });
+
         modelBuilder.HasSequence("SEQ_ACTIVIDAD");
         modelBuilder.HasSequence("SEQ_CANTON");
         modelBuilder.HasSequence("SEQ_CATEGORIA_ACTIVIDAD");

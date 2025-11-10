@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace community_service_api.Models.NewEntities;
+namespace community_service_api.Models.DBTableEntities;
 
 public partial class Usuario
 {
     public int IdUsuario { get; set; }
 
-    public string Usuario1 { get; set; } = null!;
+    public string Username { get; set; } = null!;
 
     public string Password { get; set; } = null!;
 

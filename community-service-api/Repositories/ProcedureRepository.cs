@@ -15,7 +15,7 @@ namespace community_service_api.Repositories;
 ///     Maneja errores de Oracle y los convierte en excepciones de dominio (<see cref="BusinessRuleException" />) o de
 ///     acceso a datos (<see cref="DataAccessException" />).
 /// </summary>
-public class ProcedureRepository(ApplicationDbContext context) : IProcedureRepository
+public class ProcedureRepository(NewApplicationDbContext context) : IProcedureRepository
 {
     
     private DbTransaction? _transaction;

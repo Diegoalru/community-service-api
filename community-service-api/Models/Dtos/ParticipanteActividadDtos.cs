@@ -5,32 +5,30 @@ namespace community_service_api.Models.Dtos;
 
 public class ParticipanteActividadDto
 {
-    public Guid IdParticipanteActividad { get; set; }
-    public Guid IdOrganizacion { get; set; }
-    public Guid IdActividad { get; set; }
-    public Guid IdHorarioActividad { get; set; }
-    public Guid IdUsuarioVoluntario { get; set; }
+    public int IdParticipanteActividad { get; set; }
+
     public DateTime FechaInscripcion { get; set; }
+
     public DateTime? FechaRetiro { get; set; }
+
     public char Situacion { get; set; }
-    public DateTime FechaDesde { get; set; }
-    public DateTime? FechaHasta { get; set; }
+
     public char Estado { get; set; }
 }
 
 public class ParticipanteActividadCreateDto
 {
     [Required]
-    public Guid IdOrganizacion { get; set; }
+    public int IdOrganizacion { get; set; }
 
     [Required]
-    public Guid IdActividad { get; set; }
+    public int IdActividad { get; set; }
 
     [Required]
-    public Guid IdHorarioActividad { get; set; }
+    public int IdHorarioActividad { get; set; }
 
     [Required]
-    public Guid IdUsuarioVoluntario { get; set; }
+    public int IdUsuarioVoluntario { get; set; }
 
     [Required]
     public DateTime FechaInscripcion { get; set; }
@@ -38,10 +36,11 @@ public class ParticipanteActividadCreateDto
     public DateTime? FechaRetiro { get; set; }
 
     [Required]
-    [RegularExpression("[ARCFP]")]
+    [RegularExpression("[IARCF]")]
     public char Situacion { get; set; }
 
     public DateTime? FechaDesde { get; set; }
+
     public DateTime? FechaHasta { get; set; }
 
     [Required]

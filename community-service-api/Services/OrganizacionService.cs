@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using community_service_api.Helpers;
 using community_service_api.Models.Dtos;
-using community_service_api.Models.Entities;
+using community_service_api.Models.DBTableEntities;
 using community_service_api.Repositories;
 
 namespace community_service_api.Services;
@@ -12,10 +12,10 @@ namespace community_service_api.Services;
 public interface IOrganizacionService
 {
     Task<IEnumerable<OrganizacionDto>> GetAllAsync();
-    Task<OrganizacionDto?> GetByIdAsync(Guid id);
+    Task<OrganizacionDto?> GetByIdAsync(int id);
     Task<OrganizacionDto> CreateAsync(OrganizacionCreateDto dto);
-    Task<bool> UpdateAsync(Guid id, OrganizacionUpdateDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<bool> UpdateAsync(int id, OrganizacionUpdateDto dto);
+    Task<bool> DeleteAsync(int id);
 }
 
 public class OrganizacionService : IOrganizacionService
@@ -33,7 +33,7 @@ public class OrganizacionService : IOrganizacionService
         return entities.Select(e => e.ToDto());
     }
 
-    public async Task<OrganizacionDto?> GetByIdAsync(Guid id)
+    public async Task<OrganizacionDto?> GetByIdAsync(int id)
     {
         var entity = await _repository.GetByIdAsync(id);
         return entity?.ToDto();
@@ -46,7 +46,7 @@ public class OrganizacionService : IOrganizacionService
         return created.ToDto();
     }
 
-    public async Task<bool> UpdateAsync(Guid id, OrganizacionUpdateDto dto)
+    public async Task<bool> UpdateAsync(int id, OrganizacionUpdateDto dto)
     {
         var entity = await _repository.GetByIdAsync(id);
         if (entity is null)
@@ -59,7 +59,7 @@ public class OrganizacionService : IOrganizacionService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(int id)
     {
         return await _repository.DeleteAsync(id);
     }
