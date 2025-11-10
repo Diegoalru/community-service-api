@@ -7,16 +7,6 @@ public class CoordinadorActividadDto
 {
     public int IdCoordinadorActividad { get; set; }
 
-    public int IdOrganizacion { get; set; }
-
-    public int IdActividad { get; set; }
-
-    public int IdUsuarioCoordinador { get; set; }
-
-    public DateTime FechaDesde { get; set; }
-
-    public DateTime? FechaHasta { get; set; }
-
     public char Estado { get; set; }
 }
 

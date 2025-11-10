@@ -7,12 +7,6 @@ public class HorarioActividadDto
 {
     public int IdHorarioActividad { get; set; }
 
-    public int IdOrganizacion { get; set; }
-
-    public int IdActividad { get; set; }
-
-    public int IdUsuario { get; set; }
-
     public DateTime Fecha { get; set; }
 
     public DateTime HoraInicio { get; set; }
@@ -22,10 +16,6 @@ public class HorarioActividadDto
     public string? Descripcion { get; set; }
 
     public char Situacion { get; set; }
-
-    public DateTime FechaDesde { get; set; }
-
-    public DateTime? FechaHasta { get; set; }
 
     public char Estado { get; set; }
 }

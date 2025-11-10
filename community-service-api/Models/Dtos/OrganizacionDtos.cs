@@ -7,10 +7,6 @@ public class OrganizacionDto
 {
     public int IdOrganizacion { get; set; }
 
-    public int IdUsuarioCreador { get; set; }
-
-    public int IdUbicacion { get; set; }
-
     public string Nombre { get; set; } = string.Empty;
 
     public string Descripcion { get; set; } = string.Empty;
@@ -20,10 +16,6 @@ public class OrganizacionDto
     public string? Telefono { get; set; }
 
     public string? SitioWeb { get; set; }
-
-    public DateTime FechaDesde { get; set; }
-
-    public DateTime? FechaHasta { get; set; }
 
     public char Estado { get; set; }
 }
