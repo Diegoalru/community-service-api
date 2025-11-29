@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using QuestPDF.Fluent;
@@ -46,13 +47,28 @@ public class CertificationGenService : BackgroundService
         var activityName = "Community Service Activity";
         var participationDate = DateTime.UtcNow.ToString("D", CultureInfo.InvariantCulture);
 
+        var certificateBytes = BuildCertificatePdf(participantName, activityName, participationDate);
+
+        // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
         var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
         Directory.CreateDirectory(certificatesDirectory);
 
         var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
         var filePath = Path.Combine(certificatesDirectory, fileName);
+        File.WriteAllBytes(filePath, certificateBytes);
 
-        Document.Create(container =>
+        _logger.LogInformation("Generated participation certificate at {FilePath} (size: {ByteCount} bytes)", filePath, certificateBytes.Length);
+
+        // If you prefer a stream to send to Oracle, wrap the bytes in a MemoryStream and dispose after use.
+        using var certificateStream = new MemoryStream(certificateBytes);
+        _ = certificateStream.Length; // placeholder to illustrate availability for further processing
+
+        return Task.CompletedTask;
+    }
+
+    private static byte[] BuildCertificatePdf(string participantName, string activityName, string participationDate)
+    {
+        return Document.Create(container =>
         {
             container.Page(page =>
             {
@@ -82,10 +98,6 @@ public class CertificationGenService : BackgroundService
                     text.Span(DateTime.UtcNow.ToString("f", CultureInfo.InvariantCulture)).FontSize(10).Bold();
                 });
             });
-        }).GeneratePdf(filePath);
-
-        _logger.LogInformation("Generated participation certificate at {FilePath}", filePath);
-
-        return Task.CompletedTask;
+        }).GeneratePdf();
     }
 }
