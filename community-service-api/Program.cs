@@ -1,4 +1,5 @@
 using community_service_api.DbContext;
+using community_service_api.HostedServices;
 using community_service_api.Middleware;
 using community_service_api.Repositories;
 using community_service_api.Services;
@@ -25,6 +26,8 @@ builder.Services.AddScoped<IHorarioActividadService, HorarioActividadService>();
 builder.Services.AddScoped<IParticipanteActividadService, ParticipanteActividadService>();
 builder.Services.AddScoped<ICertificacionParticipacionService, CertificacionParticipacionService>();
 builder.Services.AddScoped<IProcedureRepository, ProcedureRepository>();
+builder.Services.AddHostedService<CertificationGenService>();
+builder.Services.AddHostedService<EmailSendService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
