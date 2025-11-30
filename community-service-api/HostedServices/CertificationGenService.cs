@@ -22,7 +22,7 @@ public class CertificationGenService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromSeconds(20));
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
             try
@@ -81,10 +81,10 @@ public class CertificationGenService : BackgroundService
         var certificacionParticipacionService = scope.ServiceProvider
             .GetRequiredService<ICertificacionParticipacionService>();
 
-        await certificacionParticipacionService.SaveCertificateDocumentAsync(
-            certificado.IdCertificacion,
-            certificateBytes,
-            cancellationToken);
+        //await certificacionParticipacionService.SaveCertificateDocumentAsync(
+        //    certificado.IdCertificacion,
+        //    certificateBytes,
+        //    cancellationToken);
     }
 
     private static byte[] BuildCertificatePdf(
@@ -108,13 +108,13 @@ public class CertificationGenService : BackgroundService
 
                     decoration.Content().Padding(1.5f, Unit.Centimetre).Border(1).BorderColor(Colors.Grey.Medium)
                         .Background(Colors.White)
+                        .Padding(1f, Unit.Centimetre)
                         .Column(column =>
                         {
                             column.Spacing(12);
 
                             column.Item().Text(organizationName)
                                 .FontSize(16)
-                                .LetterSpacing(2)
                                 .SemiBold()
                                 .AlignCenter()
                                 .FontColor(Colors.Brown.Medium);
