@@ -4,7 +4,7 @@ namespace community_service_api.Models.DBTableEntities;
 
 public partial class CertificadoParticipacion
 {
-    public Guid IdCertificacion { get; set; }
+    public int IdCertificacion { get; set; }
 
     public int IdParticipanteActividad { get; set; }
 
