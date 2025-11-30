@@ -39,9 +39,11 @@ public class CertificationGenService : BackgroundService
         }
     }
 
-    private Task GenerateSampleCertificateAsync(CancellationToken cancellationToken)
+    private async Task GenerateSampleCertificateAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        // TODO: Get pending records from Db here!
 
         var certificado = new CertificadoParticipacion
         {
@@ -78,8 +80,6 @@ public class CertificationGenService : BackgroundService
             certificado.IdCertificacion,
             certificateBytes,
             cancellationToken);
-
-        return Task.CompletedTask;
     }
 
     private static byte[] BuildCertificatePdf(
@@ -123,7 +123,7 @@ public class CertificationGenService : BackgroundService
                             {
                                 text.Span("Este certificado se otorga a ").FontSize(14);
                                 text.Span(participantName).FontSize(22).SemiBold();
-                            }).AlignCenter();
+                            });
 
                             column.Item().Text($"Por su valiosa contribución a la actividad: {activityName}")
                                 .FontSize(16)
@@ -131,7 +131,7 @@ public class CertificationGenService : BackgroundService
 
                             column.Item().PaddingVertical(10).Row(row =>
                             {
-                                row.RelativeItem().Stack(stack =>
+                                row.RelativeItem().Column(stack =>
                                 {
                                     stack.Item().Text("Detalles de participación").FontSize(14).SemiBold();
                                     stack.Item().PaddingTop(4).Text(text =>
@@ -148,7 +148,7 @@ public class CertificationGenService : BackgroundService
 
                                 row.ConstantItem(1, Unit.Centimetre);
 
-                                row.RelativeItem().Stack(stack =>
+                                row.RelativeItem().Column(stack =>
                                 {
                                     stack.Item().Text("Datos del certificado").FontSize(14).SemiBold();
                                     stack.Item().PaddingTop(4).Text(text =>
