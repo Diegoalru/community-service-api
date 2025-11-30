@@ -1,17 +1,7 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
 namespace community_service_api.HostedServices;
 
 public class EmailSendService : BackgroundService
 {
-    private readonly ILogger<EmailSendService> _logger;
-
-    public EmailSendService(ILogger<EmailSendService> logger)
-    {
-        _logger = logger;
-    }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
@@ -25,9 +15,8 @@ public class EmailSendService : BackgroundService
             {
                 break;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error while sending pending emails");
             }
         }
     }
@@ -36,8 +25,7 @@ public class EmailSendService : BackgroundService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        // TODO: wire up real email delivery once infrastructure is available
-        _logger.LogInformation("Checked and dispatched pending participation emails at {Time}", DateTimeOffset.UtcNow);
+        // TODO: Set up gmail app secret to send emails + SMTP client
 
         return Task.CompletedTask;
     }

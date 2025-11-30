@@ -1,7 +1,5 @@
 using System.Globalization;
-using System.IO;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -10,17 +8,14 @@ namespace community_service_api.HostedServices;
 
 public class CertificationGenService : BackgroundService
 {
-    private readonly ILogger<CertificationGenService> _logger;
-
-    public CertificationGenService(ILogger<CertificationGenService> logger)
+    public CertificationGenService()
     {
-        _logger = logger;
         Settings.License = LicenseType.Community;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(20));
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
             try
@@ -32,9 +27,8 @@ public class CertificationGenService : BackgroundService
                 // Cancellation requested, exit gracefully
                 break;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error while generating participation certificate");
             }
         }
     }
@@ -57,11 +51,7 @@ public class CertificationGenService : BackgroundService
         var filePath = Path.Combine(certificatesDirectory, fileName);
         File.WriteAllBytes(filePath, certificateBytes);
 
-        _logger.LogInformation("Generated participation certificate at {FilePath} (size: {ByteCount} bytes)", filePath, certificateBytes.Length);
-
-        // If you prefer a stream to send to Oracle, wrap the bytes in a MemoryStream and dispose after use.
-        using var certificateStream = new MemoryStream(certificateBytes);
-        _ = certificateStream.Length; // placeholder to illustrate availability for further processing
+        // TODO: save certificateBytes to database BLOB column instead of disk
 
         return Task.CompletedTask;
     }
@@ -74,7 +64,7 @@ public class CertificationGenService : BackgroundService
             {
                 page.Size(PageSizes.A4);
                 page.Margin(2, Unit.Centimetre);
-                page.DefaultTextStyle(t => t.FontFamily(Fonts.Sans));
+                page.DefaultTextStyle(t => t.FontFamily(Fonts.Arial));
 
                 page.Header().Row(row =>
                 {
