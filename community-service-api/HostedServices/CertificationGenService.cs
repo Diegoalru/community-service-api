@@ -2,6 +2,7 @@ using community_service_api.Models.DBTableEntities;
 using community_service_api.Services;
 using System.Globalization;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -11,12 +12,12 @@ namespace community_service_api.HostedServices;
 
 public class CertificationGenService : BackgroundService
 {
-    private readonly ICertificacionParticipacionService _certificacionParticipacionService;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public CertificationGenService(ICertificacionParticipacionService certificacionParticipacionService)
+    public CertificationGenService(IServiceScopeFactory serviceScopeFactory)
     {
         Settings.License = LicenseType.Community;
-        _certificacionParticipacionService = certificacionParticipacionService;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -76,7 +77,11 @@ public class CertificationGenService : BackgroundService
         var filePath = Path.Combine(certificatesDirectory, fileName);
         File.WriteAllBytes(filePath, certificateBytes);
 
-        await _certificacionParticipacionService.SaveCertificateDocumentAsync(
+        using var scope = _serviceScopeFactory.CreateScope();
+        var certificacionParticipacionService = scope.ServiceProvider
+            .GetRequiredService<ICertificacionParticipacionService>();
+
+        await certificacionParticipacionService.SaveCertificateDocumentAsync(
             certificado.IdCertificacion,
             certificateBytes,
             cancellationToken);
