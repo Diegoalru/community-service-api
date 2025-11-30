@@ -1,4 +1,7 @@
+using community_service_api.Models.DBTableEntities;
+using community_service_api.Services;
 using System.Globalization;
+using System.IO;
 using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -8,9 +11,12 @@ namespace community_service_api.HostedServices;
 
 public class CertificationGenService : BackgroundService
 {
-    public CertificationGenService()
+    private readonly ICertificacionParticipacionService _certificacionParticipacionService;
+
+    public CertificationGenService(ICertificacionParticipacionService certificacionParticipacionService)
     {
         Settings.License = LicenseType.Community;
+        _certificacionParticipacionService = certificacionParticipacionService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,11 +43,28 @@ public class CertificationGenService : BackgroundService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var participantName = "Community Participant";
-        var activityName = "Community Service Activity";
-        var participationDate = DateTime.UtcNow.ToString("D", CultureInfo.InvariantCulture);
+        var certificado = new CertificadoParticipacion
+        {
+            IdCertificacion = 1,
+            IdParticipanteActividad = 1001,
+            IdActividad = 2001,
+            IdOrganizacion = 3001,
+            IdUsuarioVoluntario = 4001,
+            FechaEmision = DateTime.UtcNow,
+            HorasTotales = 40,
+            DiasTotales = 10,
+            FechaPrimeraAsistencia = DateTime.UtcNow.AddMonths(-2),
+            FechaUltimaAsistencia = DateTime.UtcNow.AddDays(-7),
+            Observaciones = "Gracias por tu dedicación y compromiso continuo.",
+            Situacion = "E",
+            Estado = "A",
+        };
 
-        var certificateBytes = BuildCertificatePdf(participantName, activityName, participationDate);
+        var participantName = "Community Participant";
+        var organizationName = "Community Service Organization";
+        var activityName = "Community Service Activity";
+
+        var certificateBytes = BuildCertificatePdf(certificado, participantName, organizationName, activityName);
 
         // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
         var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
@@ -51,47 +74,117 @@ public class CertificationGenService : BackgroundService
         var filePath = Path.Combine(certificatesDirectory, fileName);
         File.WriteAllBytes(filePath, certificateBytes);
 
-        // TODO: save certificateBytes to database BLOB column instead of disk
-
-        // Steps: in CertificacionParticipacionService create a method to save/update the byte[] to the CertificadoParticipacion.Documento field
-        // follow same format as CreateUsuarioWithProcedureAsync in UsuarioService.cs
-
-        // then call that new method from here pass the IdCertificacion and certificateBytes
-        // asume we call db on top  of this method to get the ids of the CertificadoParticipacion (IdCertificacion) records that need certificates generated
+        await _certificacionParticipacionService.SaveCertificateDocumentAsync(
+            certificado.IdCertificacion,
+            certificateBytes,
+            cancellationToken);
 
         return Task.CompletedTask;
     }
 
-    private static byte[] BuildCertificatePdf(string participantName, string activityName, string participationDate)
+    private static byte[] BuildCertificatePdf(
+        CertificadoParticipacion certificado,
+        string participantName,
+        string organizationName,
+        string activityName)
     {
         return Document.Create(container =>
         {
             container.Page(page =>
             {
-                page.Size(PageSizes.A4);
-                page.Margin(2, Unit.Centimetre);
-                page.DefaultTextStyle(t => t.FontFamily(Fonts.Arial));
+                page.Size(PageSizes.Letter.Landscape());
+                page.Margin(1.5f, Unit.Centimetre);
+                page.PageColor(Colors.Grey.Lighten4);
+                page.DefaultTextStyle(t => t.FontFamily(Fonts.Calibri).FontSize(12));
 
-                page.Header().Row(row =>
+                page.Content().Padding(1.5f, Unit.Centimetre).Decoration(decoration =>
                 {
-                    row.RelativeItem().Text("Participation Certificate")
-                        .FontSize(28)
-                        .SemiBold()
-                        .AlignCenter();
-                });
+                    decoration.Before().Border(4).BorderColor(Colors.Brown.Medium);
 
-                page.Content().PaddingVertical(2, Unit.Centimetre).Column(column =>
-                {
-                    column.Item().Text("This certificate is proudly presented to").FontSize(14).AlignCenter();
-                    column.Item().Text(participantName).FontSize(24).Bold().AlignCenter();
-                    column.Item().PaddingTop(10).Text($"For participating in: {activityName}").FontSize(16).AlignCenter();
-                    column.Item().Text($"Date: {participationDate}").FontSize(12).AlignCenter();
-                });
+                    decoration.Content().Padding(1.5f, Unit.Centimetre).Border(1).BorderColor(Colors.Grey.Medium)
+                        .Background(Colors.White)
+                        .Column(column =>
+                        {
+                            column.Spacing(12);
 
-                page.Footer().AlignCenter().Text(text =>
-                {
-                    text.Span("Generated on ").FontSize(10);
-                    text.Span(DateTime.UtcNow.ToString("f", CultureInfo.InvariantCulture)).FontSize(10).Bold();
+                            column.Item().Text(organizationName)
+                                .FontSize(16)
+                                .LetterSpacing(2)
+                                .SemiBold()
+                                .AlignCenter()
+                                .FontColor(Colors.Brown.Medium);
+
+                            column.Item().Text("Certificado de Participación")
+                                .FontSize(34)
+                                .SemiBold()
+                                .AlignCenter();
+
+                            column.Item().Text(text =>
+                            {
+                                text.Span("Este certificado se otorga a ").FontSize(14);
+                                text.Span(participantName).FontSize(22).SemiBold();
+                            }).AlignCenter();
+
+                            column.Item().Text($"Por su valiosa contribución a la actividad: {activityName}")
+                                .FontSize(16)
+                                .AlignCenter();
+
+                            column.Item().PaddingVertical(10).Row(row =>
+                            {
+                                row.RelativeItem().Stack(stack =>
+                                {
+                                    stack.Item().Text("Detalles de participación").FontSize(14).SemiBold();
+                                    stack.Item().PaddingTop(4).Text(text =>
+                                    {
+                                        text.Span("Horas totales: ").SemiBold();
+                                        text.Span(certificado.HorasTotales.ToString(CultureInfo.InvariantCulture));
+                                        text.Line("Días totales: " + certificado.DiasTotales.ToString(CultureInfo.InvariantCulture));
+                                        text.Line(
+                                            $"Primera asistencia: {certificado.FechaPrimeraAsistencia:dd 'de' MMMM yyyy}");
+                                        text.Line(
+                                            $"Última asistencia: {certificado.FechaUltimaAsistencia:dd 'de' MMMM yyyy}");
+                                    });
+                                });
+
+                                row.ConstantItem(1, Unit.Centimetre);
+
+                                row.RelativeItem().Stack(stack =>
+                                {
+                                    stack.Item().Text("Datos del certificado").FontSize(14).SemiBold();
+                                    stack.Item().PaddingTop(4).Text(text =>
+                                    {
+                                        text.Line($"ID Certificación: {certificado.IdCertificacion}");
+                                        text.Line($"Emitido el: {certificado.FechaEmision:dd 'de' MMMM yyyy}");
+                                        text.Line($"Situación: {certificado.Situacion}");
+                                        text.Line($"Estado: {certificado.Estado}");
+                                    });
+                                });
+                            });
+
+                            if (!string.IsNullOrWhiteSpace(certificado.Observaciones))
+                            {
+                                column.Item().PaddingTop(6).Text(text =>
+                                {
+                                    text.Span("Observaciones: ").SemiBold();
+                                    text.Span(certificado.Observaciones);
+                                });
+                            }
+
+                            column.Item().PaddingTop(16).Row(row =>
+                            {
+                                row.RelativeItem().Column(col =>
+                                {
+                                    col.Item().Text("_____________________________").AlignCenter();
+                                    col.Item().Text("Representante de la organización").AlignCenter();
+                                });
+
+                                row.RelativeItem().Column(col =>
+                                {
+                                    col.Item().Text("_____________________________").AlignCenter();
+                                    col.Item().Text(participantName).AlignCenter();
+                                });
+                            });
+                        });
                 });
             });
         }).GeneratePdf();

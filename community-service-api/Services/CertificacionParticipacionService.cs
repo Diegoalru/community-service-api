@@ -1,7 +1,9 @@
+using System.Data;
 using community_service_api.Helpers;
 using community_service_api.Models.DBTableEntities;
 using community_service_api.Models.Dtos;
 using community_service_api.Repositories;
+using Dapper.Oracle;
 
 namespace community_service_api.Services;
 
@@ -12,15 +14,20 @@ public interface ICertificacionParticipacionService
     Task<CertificacionParticipacionDto> CreateAsync(CertificacionParticipacionCreateDto dto);
     Task<bool> UpdateAsync(Guid id, CertificacionParticipacionUpdateDto dto);
     Task<bool> DeleteAsync(Guid id);
+    Task SaveCertificateDocumentAsync(int idCertificacion, byte[] documento, CancellationToken cancellationToken);
 }
 
 public class CertificacionParticipacionService : ICertificacionParticipacionService
 {
     private readonly IRepository<CertificadoParticipacion> _repository;
+    private readonly IProcedureRepository _procedureRepository;
 
-    public CertificacionParticipacionService(IRepository<CertificadoParticipacion> repository)
+    public CertificacionParticipacionService(
+        IRepository<CertificadoParticipacion> repository,
+        IProcedureRepository procedureRepository)
     {
         _repository = repository;
+        _procedureRepository = procedureRepository;
     }
 
     public async Task<IEnumerable<CertificacionParticipacionDto>> GetAllAsync()
@@ -58,5 +65,32 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
     public async Task<bool> DeleteAsync(Guid id)
     {
         return await _repository.DeleteAsync(id);
+    }
+
+    public async Task SaveCertificateDocumentAsync(int idCertificacion, byte[] documento, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await _procedureRepository.BeginTransactionAsync();
+
+        try
+        {
+            var parameters = new OracleDynamicParameters();
+            parameters.Add("PV_ID_CERTIFICACION", idCertificacion, OracleMappingType.Int32, ParameterDirection.Input);
+            parameters.Add("PV_DOCUMENTO", documento, OracleMappingType.Blob, ParameterDirection.Input);
+            parameters.Add("PV_RESULTADO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+
+            await _procedureRepository.ExecuteAsync<int>(
+                "PKG_CERTIFICADO_PARTICIPACION.P_GUARDAR_DOCUMENTO",
+                parameters,
+                "PV_RESULTADO");
+
+            await _procedureRepository.CommitTransactionAsync();
+        }
+        catch
+        {
+            await _procedureRepository.RollbackTransactionAsync();
+            throw;
+        }
     }
 }
