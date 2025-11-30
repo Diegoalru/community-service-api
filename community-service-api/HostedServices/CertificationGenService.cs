@@ -53,6 +53,12 @@ public class CertificationGenService : BackgroundService
 
         // TODO: save certificateBytes to database BLOB column instead of disk
 
+        // Steps: in CertificacionParticipacionService create a method to save/update the byte[] to the CertificadoParticipacion.Documento field
+        // follow same format as CreateUsuarioWithProcedureAsync in UsuarioService.cs
+
+        // then call that new method from here pass the IdCertificacion and certificateBytes
+        // asume we call db on top  of this method to get the ids of the CertificadoParticipacion (IdCertificacion) records that need certificates generated
+
         return Task.CompletedTask;
     }
 
