@@ -81,10 +81,10 @@ public class CertificationGenService : BackgroundService
         var certificacionParticipacionService = scope.ServiceProvider
             .GetRequiredService<ICertificacionParticipacionService>();
 
-        //await certificacionParticipacionService.SaveCertificateDocumentAsync(
-        //    certificado.IdCertificacion,
-        //    certificateBytes,
-        //    cancellationToken);
+        await certificacionParticipacionService.SaveCertificateDocumentAsync(
+            certificado.IdCertificacion,
+            certificateBytes,
+            cancellationToken);
     }
 
     private static byte[] BuildCertificatePdf(
