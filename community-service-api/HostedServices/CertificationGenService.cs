@@ -29,12 +29,12 @@ public class CertificationGenService : BackgroundService
             {
                 await GenerateSampleCertificateAsync(stoppingToken);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
                 // Cancellation requested, exit gracefully
                 break;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
         }
@@ -44,11 +44,16 @@ public class CertificationGenService : BackgroundService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        using var scope = _serviceScopeFactory.CreateScope();
+        var certificacionParticipacionService = scope.ServiceProvider
+            .GetRequiredService<ICertificacionParticipacionService>();
+
         // TODO: Get pending records from Db here!
+
+        var r = await certificacionParticipacionService.GetAllAsync();
 
         var certificado = new CertificadoParticipacion
         {
-            IdCertificacion = 1,
             IdParticipanteActividad = 1001,
             IdActividad = 2001,
             IdOrganizacion = 3001,
@@ -76,10 +81,6 @@ public class CertificationGenService : BackgroundService
         var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
         var filePath = Path.Combine(certificatesDirectory, fileName);
         File.WriteAllBytes(filePath, certificateBytes);
-
-        using var scope = _serviceScopeFactory.CreateScope();
-        var certificacionParticipacionService = scope.ServiceProvider
-            .GetRequiredService<ICertificacionParticipacionService>();
 
         await certificacionParticipacionService.SaveCertificateDocumentAsync(
             certificado.IdCertificacion,
@@ -117,7 +118,7 @@ public class CertificationGenService : BackgroundService
                                 .FontSize(16)
                                 .SemiBold()
                                 .AlignCenter()
-                                .FontColor(Colors.Brown.Medium);
+                                .FontColor(Colors.Teal.Medium);
 
                             column.Item().Text("Certificado de Participación")
                                 .FontSize(34)
