@@ -5,7 +5,7 @@ namespace community_service_api.Models.Dtos;
 
 public class CertificacionParticipacionDto
 {
-    public int IdCertificacion { get; set; }
+    public Guid IdCertificacion { get; set; }
 
     public DateTime FechaEmision { get; set; }
 

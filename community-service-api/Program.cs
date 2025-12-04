@@ -1,15 +1,28 @@
 using community_service_api.DbContext;
 using community_service_api.HostedServices;
 using community_service_api.Middleware;
+using community_service_api.Models;
 using community_service_api.Repositories;
 using community_service_api.Services;
 using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Configure Oracle connection with wallet location
+var connectionString = builder.Configuration.GetConnectionString("OracleConnection");
+var walletPath = Path.Combine(AppContext.BaseDirectory, "Wallet");
+
+// Configure Oracle client to use the wallet
+OracleConfiguration.WalletLocation = walletPath;
+OracleConfiguration.TnsAdmin = walletPath;
+
 builder.Services.AddDbContext<NewApplicationDbContext>(options =>
-    options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
+    options.UseOracle(connectionString));
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
@@ -32,6 +45,17 @@ builder.Services.AddHostedService<EmailSendService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 

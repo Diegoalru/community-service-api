@@ -14,7 +14,8 @@ public interface ICertificacionParticipacionService
     Task<CertificacionParticipacionDto> CreateAsync(CertificacionParticipacionCreateDto dto);
     Task<bool> UpdateAsync(Guid id, CertificacionParticipacionUpdateDto dto);
     Task<bool> DeleteAsync(Guid id);
-    Task SaveCertificateDocumentAsync(int idCertificacion, byte[] documento, CancellationToken cancellationToken);
+    Task SaveCertificateDocumentAsync(Guid idCertificacion, byte[] documento, CancellationToken cancellationToken);
+    Task<IEnumerable<CertificadoParticipacion>> GetRecordsToAddCertificate(CancellationToken cancellationToken);
 }
 
 public class CertificacionParticipacionService : ICertificacionParticipacionService
@@ -67,7 +68,7 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
         return await _repository.DeleteAsync(id);
     }
 
-    public async Task SaveCertificateDocumentAsync(int idCertificacion, byte[] documento, CancellationToken cancellationToken)
+    public async Task SaveCertificateDocumentAsync(Guid idCertificacion, byte[] documento, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -76,20 +77,39 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
         try
         {
             var parameters = new OracleDynamicParameters();
-            parameters.Add("PV_ID_CERTIFICACION", idCertificacion, OracleMappingType.Int32, ParameterDirection.Input);
-            parameters.Add("PV_DOCUMENTO", documento, OracleMappingType.Blob, ParameterDirection.Input);
-            parameters.Add("PV_RESULTADO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("PR_ID_CERTIFICACION", idCertificacion.ToByteArray(), OracleMappingType.Raw, ParameterDirection.Input);
+            parameters.Add("PB_DOCUMENTO", documento, OracleMappingType.Blob, ParameterDirection.Input);
+            parameters.Add("PB_EXITO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("PV_MENSAJE_ERROR", dbType: OracleMappingType.Varchar2, direction: ParameterDirection.Output);
 
-            await _procedureRepository.ExecuteAsync<int>(
-                "PKG_CERTIFICADO_PARTICIPACION.P_GUARDAR_DOCUMENTO",
+            await _procedureRepository.ExecuteAsync<string>(
+                "P_ADJUNTAR_DOCUMENTO",
                 parameters,
-                "PV_RESULTADO");
+                "PV_MENSAJE_ERROR");
 
             await _procedureRepository.CommitTransactionAsync();
         }
         catch
         {
             await _procedureRepository.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<CertificadoParticipacion>> GetRecordsToAddCertificate(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        try
+        {
+            // TODO: Fix this call!
+
+            var results = await _procedureRepository.QueryAsync<CertificadoParticipacion>("P_OBTENER_DATOS_PDF", null);
+
+            return results;
+        }
+        catch(Exception ex)
+        {
             throw;
         }
     }

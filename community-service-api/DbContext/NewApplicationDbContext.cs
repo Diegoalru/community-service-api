@@ -235,7 +235,8 @@ public partial class NewApplicationDbContext : Microsoft.EntityFrameworkCore.DbC
 
             entity.Property(e => e.IdCertificacion)
                 .HasDefaultValueSql("SYS_GUID()")
-                .HasColumnName("ID_CERTIFICACION");
+                .HasColumnName("ID_CERTIFICACION")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.DiasTotales)
                 .HasPrecision(10)
                 .HasColumnName("DIAS_TOTALES");
