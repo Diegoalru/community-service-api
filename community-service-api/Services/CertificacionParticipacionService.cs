@@ -15,6 +15,7 @@ public interface ICertificacionParticipacionService
     Task<bool> UpdateAsync(Guid id, CertificacionParticipacionUpdateDto dto);
     Task<bool> DeleteAsync(Guid id);
     Task SaveCertificateDocumentAsync(Guid idCertificacion, byte[] documento, CancellationToken cancellationToken);
+    Task<IEnumerable<CertificadoParticipacion>> GetRecordsToAddCertificate(CancellationToken cancellationToken);
 }
 
 public class CertificacionParticipacionService : ICertificacionParticipacionService
@@ -91,6 +92,24 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
         catch
         {
             await _procedureRepository.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<CertificadoParticipacion>> GetRecordsToAddCertificate(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        try
+        {
+            // TODO: Fix this call!
+
+            var results = await _procedureRepository.QueryAsync<CertificadoParticipacion>("P_OBTENER_DATOS_PDF", null);
+
+            return results;
+        }
+        catch(Exception ex)
+        {
             throw;
         }
     }

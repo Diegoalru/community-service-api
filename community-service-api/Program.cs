@@ -1,6 +1,7 @@
 using community_service_api.DbContext;
 using community_service_api.HostedServices;
 using community_service_api.Middleware;
+using community_service_api.Models;
 using community_service_api.Repositories;
 using community_service_api.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,8 @@ OracleConfiguration.TnsAdmin = walletPath;
 
 builder.Services.AddDbContext<NewApplicationDbContext>(options =>
     options.UseOracle(connectionString));
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
@@ -42,6 +45,17 @@ builder.Services.AddHostedService<EmailSendService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 

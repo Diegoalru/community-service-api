@@ -1,8 +1,6 @@
 using community_service_api.Models.DBTableEntities;
 using community_service_api.Services;
 using System.Globalization;
-using System.IO;
-using Microsoft.Extensions.DependencyInjection;
 using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -22,12 +20,13 @@ public class CertificationGenService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
+        var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
             try
             {
-                await GenerateSampleCertificateAsync(stoppingToken);
+                return;
+                // await GenerateSampleCertificateAsync(stoppingToken);
             }
             catch (OperationCanceledException ex)
             {
@@ -48,44 +47,29 @@ public class CertificationGenService : BackgroundService
         var certificacionParticipacionService = scope.ServiceProvider
             .GetRequiredService<ICertificacionParticipacionService>();
 
-        // TODO: Get pending records from Db here!
+        var pendingToGenerate = await certificacionParticipacionService.GetRecordsToAddCertificate(cancellationToken);
 
-        var r = await certificacionParticipacionService.GetAllAsync();
-
-        var certificado = new CertificadoParticipacion
+        foreach (var item in pendingToGenerate)
         {
-            IdParticipanteActividad = 1001,
-            IdActividad = 2001,
-            IdOrganizacion = 3001,
-            IdUsuarioVoluntario = 4001,
-            FechaEmision = DateTime.UtcNow,
-            HorasTotales = 40,
-            DiasTotales = 10,
-            FechaPrimeraAsistencia = DateTime.UtcNow.AddMonths(-2),
-            FechaUltimaAsistencia = DateTime.UtcNow.AddDays(-7),
-            Observaciones = "Gracias por tu dedicación y compromiso continuo.",
-            Situacion = "E",
-            Estado = "A",
-        };
+            var participantName = "Community Participant";
+            var organizationName = "Community Service Organization";
+            var activityName = "Community Service Activity";
 
-        var participantName = "Community Participant";
-        var organizationName = "Community Service Organization";
-        var activityName = "Community Service Activity";
+            var certificateBytes = BuildCertificatePdf(item, participantName, organizationName, activityName);
 
-        var certificateBytes = BuildCertificatePdf(certificado, participantName, organizationName, activityName);
+            // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
+            //var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
+            //Directory.CreateDirectory(certificatesDirectory);
 
-        // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
-        var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
-        Directory.CreateDirectory(certificatesDirectory);
+            //var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
+            //var filePath = Path.Combine(certificatesDirectory, fileName);
+            //File.WriteAllBytes(filePath, certificateBytes);
 
-        var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
-        var filePath = Path.Combine(certificatesDirectory, fileName);
-        File.WriteAllBytes(filePath, certificateBytes);
-
-        await certificacionParticipacionService.SaveCertificateDocumentAsync(
-            certificado.IdCertificacion,
-            certificateBytes,
-            cancellationToken);
+            await certificacionParticipacionService.SaveCertificateDocumentAsync(
+                item.IdCertificacion,
+                certificateBytes,
+                cancellationToken);
+        }
     }
 
     private static byte[] BuildCertificatePdf(
