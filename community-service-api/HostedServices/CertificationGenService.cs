@@ -1,10 +1,11 @@
 using community_service_api.Models.DBTableEntities;
+using community_service_api.Models.Dtos;
 using community_service_api.Services;
-using System.Globalization;
 using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using System.Globalization;
 
 namespace community_service_api.HostedServices;
 
@@ -20,17 +21,16 @@ public class CertificationGenService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
+
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
             try
             {
-                return;
-                // await GenerateSampleCertificateAsync(stoppingToken);
+                await GenerateSampleCertificateAsync(stoppingToken);
             }
             catch (OperationCanceledException ex)
             {
-                // Cancellation requested, exit gracefully
                 break;
             }
             catch (Exception ex)
@@ -47,33 +47,36 @@ public class CertificationGenService : BackgroundService
         var certificacionParticipacionService = scope.ServiceProvider
             .GetRequiredService<ICertificacionParticipacionService>();
 
-        var pendingToGenerate = await certificacionParticipacionService.GetRecordsToAddCertificate(cancellationToken);
+        var data = await certificacionParticipacionService.GetCertificatePdfDataAsync("P");
 
-        foreach (var item in pendingToGenerate)
+        foreach (var item in data)
         {
-            var participantName = "Community Participant";
-            var organizationName = "Community Service Organization";
-            var activityName = "Community Service Activity";
+            if (item != null)
+            {
+                var participantName = item.NombreVoluntario;
+                var organizationName = item.NombreOrganizacion;
+                var activityName = item.NombreActividad;
 
-            var certificateBytes = BuildCertificatePdf(item, participantName, organizationName, activityName);
+                var certificateBytes = BuildCertificatePdf(item, participantName, organizationName, activityName);
 
-            // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
-            //var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
-            //Directory.CreateDirectory(certificatesDirectory);
+                // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
+                //var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
+                //Directory.CreateDirectory(certificatesDirectory);
 
-            //var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
-            //var filePath = Path.Combine(certificatesDirectory, fileName);
-            //File.WriteAllBytes(filePath, certificateBytes);
+                //var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
+                //var filePath = Path.Combine(certificatesDirectory, fileName);
+                //File.WriteAllBytes(filePath, certificateBytes);
 
-            await certificacionParticipacionService.SaveCertificateDocumentAsync(
-                item.IdCertificacion,
-                certificateBytes,
-                cancellationToken);
+                await certificacionParticipacionService.SaveCertificateDocumentAsync(
+                    item.GetIdCertificacionAsGuid(),
+                    certificateBytes,
+                    cancellationToken);
+            }
         }
     }
 
     private static byte[] BuildCertificatePdf(
-        CertificadoParticipacion certificado,
+        CertificatePdfDataDto certificado,
         string participantName,
         string organizationName,
         string activityName)
@@ -130,9 +133,9 @@ public class CertificationGenService : BackgroundService
                                         text.Span(certificado.HorasTotales.ToString(CultureInfo.InvariantCulture));
                                         text.Line("Días totales: " + certificado.DiasTotales.ToString(CultureInfo.InvariantCulture));
                                         text.Line(
-                                            $"Primera asistencia: {certificado.FechaPrimeraAsistencia:dd 'de' MMMM yyyy}");
+                                            $"Primera asistencia: {certificado.FechaInicio:dd 'de' MMMM yyyy}");
                                         text.Line(
-                                            $"Última asistencia: {certificado.FechaUltimaAsistencia:dd 'de' MMMM yyyy}");
+                                            $"Última asistencia: {certificado.FechaFin:dd 'de' MMMM yyyy}");
                                     });
                                 });
 
@@ -144,21 +147,11 @@ public class CertificationGenService : BackgroundService
                                     stack.Item().PaddingTop(4).Text(text =>
                                     {
                                         text.Line($"ID Certificación: {certificado.IdCertificacion}");
-                                        text.Line($"Emitido el: {certificado.FechaEmision:dd 'de' MMMM yyyy}");
-                                        text.Line($"Situación: {certificado.Situacion}");
-                                        text.Line($"Estado: {certificado.Estado}");
+                                        text.Line($"Emitido el: {certificado.FechaEmisionTexto:dd 'de' MMMM yyyy}");
+                                        text.Line($"Lugar: {certificado.LugarEvento}");
                                     });
                                 });
                             });
-
-                            if (!string.IsNullOrWhiteSpace(certificado.Observaciones))
-                            {
-                                column.Item().PaddingTop(6).Text(text =>
-                                {
-                                    text.Span("Observaciones: ").SemiBold();
-                                    text.Span(certificado.Observaciones);
-                                });
-                            }
 
                             column.Item().PaddingTop(16).Row(row =>
                             {

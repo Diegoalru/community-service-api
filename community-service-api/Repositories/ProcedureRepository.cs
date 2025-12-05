@@ -146,6 +146,67 @@ public class ProcedureRepository(NewApplicationDbContext context) : IProcedureRe
     }
 
     /// <summary>
+    ///     Ejecuta un bloque PL/SQL anónimo y devuelve los resultados del cursor de salida.
+    ///     Útil para procedimientos con parámetros BOOLEAN que no pueden ser bindeados directamente desde .NET.
+    /// </summary>
+    public async Task<IEnumerable<T>> QueryWithAnonymousBlockAsync<T>(string plsqlBlock, OracleDynamicParameters parameters)
+    {
+        var connection = context.Database.GetDbConnection();
+        await EnsureOpenAsync(connection);
+
+        if (connection is OracleConnection oc)
+            oc.BindByName = true;
+
+        try
+        {
+            return await connection.QueryAsync<T>(
+                plsqlBlock,
+                parameters,
+                commandType: CommandType.Text
+            );
+        }
+        catch (OracleException ex) when (IsAppError(ex))
+        {
+            throw new BusinessRuleException(CleanOracleMessage(ex.Message), ex);
+        }
+        catch (OracleException ex)
+        {
+            throw new DataAccessException(MapOracleError(ex), ex);
+        }
+    }
+
+    /// <summary>
+    ///     Ejecuta un bloque PL/SQL anónimo sin devolver resultados.
+    ///     Útil para procedimientos con parámetros BOOLEAN que no pueden ser bindeados directamente desde .NET.
+    /// </summary>
+    public async Task ExecuteAnonymousBlockAsync(string plsqlBlock, OracleDynamicParameters parameters)
+    {
+        var connection = context.Database.GetDbConnection();
+        await EnsureOpenAsync(connection);
+
+        if (connection is OracleConnection oc)
+            oc.BindByName = true;
+
+        try
+        {
+            await connection.ExecuteAsync(
+                plsqlBlock,
+                parameters,
+                transaction: _transaction,
+                commandType: CommandType.Text
+            );
+        }
+        catch (OracleException ex) when (IsAppError(ex))
+        {
+            throw new BusinessRuleException(CleanOracleMessage(ex.Message), ex);
+        }
+        catch (OracleException ex)
+        {
+            throw new DataAccessException(MapOracleError(ex), ex);
+        }
+    }
+
+    /// <summary>
     ///     Asegura que la conexión a la base de datos esté abierta antes de usarla.
     /// </summary>
     /// <param name="connection">Conexión de base de datos.</param>

@@ -1,4 +1,7 @@
+using community_service_api.MailTemplates;
 using community_service_api.Models;
+using community_service_api.Models.Dtos;
+using community_service_api.Services;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -7,56 +10,78 @@ namespace community_service_api.HostedServices;
 
 public class EmailSendService : BackgroundService
 {
-    private readonly IServiceProvider serviceProvider;
-    private readonly IOptions<EmailSettings> emailSettings;
+    private readonly IServiceScopeFactory serviceScopeFactory;
+    private readonly EmailSettings emailSettings;
 
-    public EmailSendService(IServiceProvider serviceProvider, IOptions<EmailSettings> emailSettings)
+    public EmailSendService(IServiceScopeFactory serviceScopeFactory, IOptions<EmailSettings> emailSettings)
     {
-        this.serviceProvider = serviceProvider;
-        this.emailSettings = emailSettings;
+        this.serviceScopeFactory = serviceScopeFactory;
+        this.emailSettings = emailSettings.Value;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            //var upcomingReservations = await this.GetReservationsToSendNotificationAsync(stoppingToken);
+            var toNotify = await this.GetCertificates();
 
-            //foreach (var reservation in upcomingReservations)
-            //{
-            //    try
-            //    {
-            //        await SendEmailAsync(reservation.User.Email, ReminderMailTemplate.GetReminderTemplate(reservation), "Recortadorio de su Reserva con Bundalow Paradise!");
-            //        await UpdateNotificationStatusAsync(reservation, "Sent");
-            //    }
-            //    catch (Exception)
-            //    {
-            //        await UpdateNotificationStatusAsync(reservation, "Not Sent: Error");
-            //    }
-            //    finally
-            //    {
-            //        // Avoid Google detecting Spam by waiting 5 seconds each time.
-            //        await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-            //    }
-
-            //}
+            foreach (var item in toNotify)
+            {
+                try
+                {
+                    await SendEmailAsync(
+                        item.EmailVoluntario,
+                        CertificateMailTemplate.GetCertificateMailTemplate(),
+                        "Certificado Generado y Procesado - Community Service App",
+                        item.Documento);
+                }
+                catch (Exception ex)
+                {
+                }
+                finally
+                {
+                    // Avoid Google detecting Spam by waiting 5 seconds each time.
+                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                }
+            }
         }
     }
 
-    public async Task SendEmailAsync(string recipientEmail, string mailTemplate, string subject)
+    public async Task SendEmailAsync(string recipientEmail, string mailTemplate, string subject, byte[] pdfAttachment)
     {
-        //var message = new MimeMessage();
-        //message.From.Add(new MailboxAddress("Hotel Online Services", _emailSettings.GmailUser));
-        //message.To.Add(new MailboxAddress("", recipientEmail));
-        //message.Subject = subject;
-        //message.Body = new TextPart("html") { Text = mailTemplate };
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress("Community Service App - Online Services", this.emailSettings.GmailUser));
+        message.To.Add(new MailboxAddress("", recipientEmail));
+        message.Subject = subject;
 
-        //using var client = new SmtpClient();
-        //await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
-        //await client.AuthenticateAsync(_emailSettings.GmailUser, _emailSettings.GmailAppPassword);
-        //await client.SendAsync(message);
-        //await client.DisconnectAsync(true);
+        var bodyBuilder = new BodyBuilder
+        {
+            HtmlBody = mailTemplate
+        };
+
+        bodyBuilder.Attachments.Add(
+            "Certificado_Participacion.pdf",
+            pdfAttachment,
+            ContentType.Parse("application/pdf"));
+
+        message.Body = bodyBuilder.ToMessageBody();
+
+        using var client = new SmtpClient();
+        await client.ConnectAsync(this.emailSettings.SmtpServer, this.emailSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(this.emailSettings.GmailUser, this.emailSettings.GmailAppPassword);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
+    }
+
+    public async Task<IEnumerable<CertificatePdfDataDto>> GetCertificates() 
+    {
+        using var scope = this.serviceScopeFactory.CreateScope();
+
+        var certificacionParticipacionService = scope.ServiceProvider
+            .GetRequiredService<ICertificacionParticipacionService>();
+
+        return await certificacionParticipacionService.GetCertificatePdfDataAsync("G");   
     }
 }

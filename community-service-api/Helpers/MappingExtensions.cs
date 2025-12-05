@@ -395,13 +395,13 @@ public static class MappingExtensions
         DiasTotales = entity.DiasTotales,
         FechaPrimeraAsistencia = entity.FechaPrimeraAsistencia,
         FechaUltimaAsistencia = entity.FechaUltimaAsistencia,
-        Situacion = entity.Situacion[0],
+        Situacion = entity.Situacion,
         Observaciones = entity.Observaciones,
         FechaEnvio = entity.FechaEnvio,
         IntentosEnvio = entity.IntentosEnvio,
         UltimoIntentoEnvio = entity.UltimoIntentoEnvio,
         UltimoErrorEnvio = entity.UltimoErrorEnvio,
-        Estado = entity.Estado[0]
+        Estado = entity.Estado
     };
 
     public static CertificadoParticipacion ToEntity(this CertificacionParticipacionCreateDto dto) => new()
@@ -415,7 +415,7 @@ public static class MappingExtensions
         DiasTotales = dto.DiasTotales,
         FechaPrimeraAsistencia = dto.FechaPrimeraAsistencia,
         FechaUltimaAsistencia = dto.FechaUltimaAsistencia,
-        Situacion = char.ToString(dto.Situacion),
+        Situacion = dto.Situacion,
         Observaciones = dto.Observaciones,
         FechaEnvio = dto.FechaEnvio,
         IntentosEnvio = dto.IntentosEnvio,
@@ -423,7 +423,7 @@ public static class MappingExtensions
         UltimoErrorEnvio = dto.UltimoErrorEnvio,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado),
+        Estado = dto.Estado,
     };
 
     public static void UpdateFromDto(this CertificadoParticipacion entity, CertificacionParticipacionUpdateDto dto)
@@ -437,7 +437,7 @@ public static class MappingExtensions
         entity.DiasTotales = dto.DiasTotales;
         entity.FechaPrimeraAsistencia = dto.FechaPrimeraAsistencia;
         entity.FechaUltimaAsistencia = dto.FechaUltimaAsistencia;
-        entity.Situacion = char.ToString(dto.Situacion);
+        entity.Situacion = dto.Situacion;
         entity.Observaciones = dto.Observaciones;
         entity.FechaEnvio = dto.FechaEnvio;
         entity.IntentosEnvio = dto.IntentosEnvio;
@@ -445,6 +445,6 @@ public static class MappingExtensions
         entity.UltimoErrorEnvio = dto.UltimoErrorEnvio;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
-        entity.Estado = char.ToString(dto.Estado);
+        entity.Estado = dto.Estado;
     }
 }
