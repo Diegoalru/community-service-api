@@ -17,7 +17,7 @@ public class CertificacionParticipacionDto
 
     public DateTime FechaUltimaAsistencia { get; set; }
 
-    public char Situacion { get; set; }
+    public string Situacion { get; set; } = null!;
 
     public string? Observaciones { get; set; }
 
@@ -29,7 +29,7 @@ public class CertificacionParticipacionDto
 
     public string? UltimoErrorEnvio { get; set; }
 
-    public char Estado { get; set; }
+    public string Estado { get; set; } = null!;
 }
 
 public class CertificacionParticipacionCreateDto
@@ -62,8 +62,9 @@ public class CertificacionParticipacionCreateDto
     public DateTime FechaUltimaAsistencia { get; set; }
 
     [Required]
-    [RegularExpression("[EPA]")]
-    public char Situacion { get; set; }
+    [RegularExpression("^[EPA]$")]
+    [MaxLength(1)]
+    public string Situacion { get; set; } = null!;
 
     [MaxLength(500)]
     public string? Observaciones { get; set; }
@@ -82,8 +83,9 @@ public class CertificacionParticipacionCreateDto
     public DateTime? FechaHasta { get; set; }
 
     [Required]
-    [RegularExpression("[AI]")]
-    public char Estado { get; set; } = 'A';
+    [RegularExpression("^[AI]$")]
+    [MaxLength(1)]
+    public string Estado { get; set; } = "A";
 }
 
 public class CertificacionParticipacionUpdateDto : CertificacionParticipacionCreateDto

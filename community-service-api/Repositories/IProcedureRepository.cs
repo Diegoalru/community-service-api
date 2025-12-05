@@ -10,4 +10,6 @@ public interface IProcedureRepository
     Task RollbackTransactionAsync();
     Task<IEnumerable<T>> QueryAsync<T>(string procedureName, OracleDynamicParameters parameters);
     Task<T?> ExecuteAsync<T>(string procedureName, OracleDynamicParameters parameters, string outputParameterName);
+    Task<IEnumerable<T>> QueryWithAnonymousBlockAsync<T>(string plsqlBlock, OracleDynamicParameters parameters);
+    Task ExecuteAnonymousBlockAsync(string plsqlBlock, OracleDynamicParameters parameters);
 }

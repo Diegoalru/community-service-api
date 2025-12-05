@@ -14,8 +14,9 @@ public interface ICertificacionParticipacionService
     Task<CertificacionParticipacionDto> CreateAsync(CertificacionParticipacionCreateDto dto);
     Task<bool> UpdateAsync(Guid id, CertificacionParticipacionUpdateDto dto);
     Task<bool> DeleteAsync(Guid id);
+    Task<IEnumerable<CertificacionParticipacionDto>> GetPendingAsync();
     Task SaveCertificateDocumentAsync(Guid idCertificacion, byte[] documento, CancellationToken cancellationToken);
-    Task<IEnumerable<CertificadoParticipacion>> GetRecordsToAddCertificate(CancellationToken cancellationToken);
+    Task<IEnumerable<CertificatePdfDataDto>> GetCertificatePdfDataAsync(string situacion);
 }
 
 public class CertificacionParticipacionService : ICertificacionParticipacionService
@@ -68,9 +69,32 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
         return await _repository.DeleteAsync(id);
     }
 
+    public async Task<IEnumerable<CertificacionParticipacionDto>> GetPendingAsync() 
+    {
+        var entities = await _repository.GetAllAsync();
+
+        var pendingEntities = entities.Where(e => e.Situacion.Equals("p", StringComparison.InvariantCultureIgnoreCase));
+
+        return pendingEntities.Select(e => e.ToDto());
+    }
+
     public async Task SaveCertificateDocumentAsync(Guid idCertificacion, byte[] documento, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        // Anonymous PL/SQL block - BOOLEAN params stay as local variables, not bound to .NET
+        const string plsqlBlock = @"
+            DECLARE
+                l_exito BOOLEAN;
+                l_mensaje VARCHAR2(4000);
+            BEGIN
+                PKG_CERTIFICADO_PARTICIPACION.P_ADJUNTAR_DOCUMENTO(
+                    PR_ID_CERTIFICACION => :PR_ID_CERTIFICACION,
+                    PB_DOCUMENTO => :PB_DOCUMENTO,
+                    PB_EXITO => l_exito,
+                    PV_MENSAJE_ERROR => l_mensaje
+                );
+            END;";
 
         await _procedureRepository.BeginTransactionAsync();
 
@@ -79,13 +103,8 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
             var parameters = new OracleDynamicParameters();
             parameters.Add("PR_ID_CERTIFICACION", idCertificacion.ToByteArray(), OracleMappingType.Raw, ParameterDirection.Input);
             parameters.Add("PB_DOCUMENTO", documento, OracleMappingType.Blob, ParameterDirection.Input);
-            parameters.Add("PB_EXITO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
-            parameters.Add("PV_MENSAJE_ERROR", dbType: OracleMappingType.Varchar2, direction: ParameterDirection.Output);
 
-            await _procedureRepository.ExecuteAsync<string>(
-                "P_ADJUNTAR_DOCUMENTO",
-                parameters,
-                "PV_MENSAJE_ERROR");
+            await _procedureRepository.ExecuteAnonymousBlockAsync(plsqlBlock, parameters);
 
             await _procedureRepository.CommitTransactionAsync();
         }
@@ -96,21 +115,26 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
         }
     }
 
-    public async Task<IEnumerable<CertificadoParticipacion>> GetRecordsToAddCertificate(CancellationToken cancellationToken)
+    public async Task<IEnumerable<CertificatePdfDataDto>> GetCertificatePdfDataAsync(string situacion)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        // Anonymous PL/SQL block - BOOLEAN params stay as local variables, not bound to .NET
+        const string plsqlBlock = @"
+            DECLARE
+                l_exito BOOLEAN;
+                l_mensaje VARCHAR2(4000);
+            BEGIN
+                PKG_CERTIFICADO_PARTICIPACION.P_OBTENER_DATOS_PDF(
+                    PV_SITUACION => :PV_SITUACION,
+                    PC_DATOS => :PC_DATOS,
+                    PB_EXITO => l_exito,
+                    PV_MENSAJE_ERROR => l_mensaje
+                );
+            END;";
 
-        try
-        {
-            // TODO: Fix this call!
+        var parameters = new OracleDynamicParameters();
+        parameters.Add("PV_SITUACION", situacion, OracleMappingType.Varchar2, ParameterDirection.Input);
+        parameters.Add("PC_DATOS", dbType: OracleMappingType.RefCursor, direction: ParameterDirection.Output);
 
-            var results = await _procedureRepository.QueryAsync<CertificadoParticipacion>("P_OBTENER_DATOS_PDF", null);
-
-            return results;
-        }
-        catch(Exception ex)
-        {
-            throw;
-        }
+        return await _procedureRepository.QueryWithAnonymousBlockAsync<CertificatePdfDataDto>(plsqlBlock, parameters);
     }
 }

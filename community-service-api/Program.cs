@@ -18,6 +18,7 @@ var walletPath = Path.Combine(AppContext.BaseDirectory, "Wallet");
 // Configure Oracle client to use the wallet
 OracleConfiguration.WalletLocation = walletPath;
 OracleConfiguration.TnsAdmin = walletPath;
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 builder.Services.AddDbContext<NewApplicationDbContext>(options =>
     options.UseOracle(connectionString));
@@ -70,7 +71,8 @@ if (env.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.UseCors();
 app.Run();
