@@ -21,7 +21,7 @@ public class CertificationGenService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
+        var timer = new PeriodicTimer(TimeSpan.FromMinutes(30));
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
@@ -47,7 +47,7 @@ public class CertificationGenService : BackgroundService
         var certificacionParticipacionService = scope.ServiceProvider
             .GetRequiredService<ICertificacionParticipacionService>();
 
-        var data = await certificacionParticipacionService.GetCertificatePdfDataAsync("P");
+        var data = await certificacionParticipacionService.GetCertificatePdfDataAsync();
 
         foreach (var item in data)
         {
@@ -92,7 +92,7 @@ public class CertificationGenService : BackgroundService
 
                 page.Content().Padding(1.5f, Unit.Centimetre).Decoration(decoration =>
                 {
-                    decoration.Before().Border(4).BorderColor(Colors.Brown.Medium);
+                    decoration.Before().Border(4).BorderColor(Colors.BlueGrey.Medium);
 
                     decoration.Content().Padding(1.5f, Unit.Centimetre).Border(1).BorderColor(Colors.Grey.Medium)
                         .Background(Colors.White)

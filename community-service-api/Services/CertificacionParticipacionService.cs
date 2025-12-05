@@ -16,7 +16,9 @@ public interface ICertificacionParticipacionService
     Task<bool> DeleteAsync(Guid id);
     Task<IEnumerable<CertificacionParticipacionDto>> GetPendingAsync();
     Task SaveCertificateDocumentAsync(Guid idCertificacion, byte[] documento, CancellationToken cancellationToken);
-    Task<IEnumerable<CertificatePdfDataDto>> GetCertificatePdfDataAsync(string situacion);
+    Task<IEnumerable<CertificatePdfDataDto>> GetCertificatePdfDataAsync();
+    Task<IEnumerable<CertificateEmailDataDto>> GetCertificateEmailDataAsync();
+    Task UpdateSendStatusAsync(Guid idCertificacion, bool envioExitoso, string? errorEnvio);
 }
 
 public class CertificacionParticipacionService : ICertificacionParticipacionService
@@ -115,7 +117,7 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
         }
     }
 
-    public async Task<IEnumerable<CertificatePdfDataDto>> GetCertificatePdfDataAsync(string situacion)
+    public async Task<IEnumerable<CertificatePdfDataDto>> GetCertificatePdfDataAsync()
     {
         // Anonymous PL/SQL block - BOOLEAN params stay as local variables, not bound to .NET
         const string plsqlBlock = @"
@@ -124,7 +126,6 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
                 l_mensaje VARCHAR2(4000);
             BEGIN
                 PKG_CERTIFICADO_PARTICIPACION.P_OBTENER_DATOS_PDF(
-                    PV_SITUACION => :PV_SITUACION,
                     PC_DATOS => :PC_DATOS,
                     PB_EXITO => l_exito,
                     PV_MENSAJE_ERROR => l_mensaje
@@ -132,9 +133,54 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
             END;";
 
         var parameters = new OracleDynamicParameters();
-        parameters.Add("PV_SITUACION", situacion, OracleMappingType.Varchar2, ParameterDirection.Input);
         parameters.Add("PC_DATOS", dbType: OracleMappingType.RefCursor, direction: ParameterDirection.Output);
 
         return await _procedureRepository.QueryWithAnonymousBlockAsync<CertificatePdfDataDto>(plsqlBlock, parameters);
+    }
+
+    public async Task<IEnumerable<CertificateEmailDataDto>> GetCertificateEmailDataAsync()
+    {
+        // Anonymous PL/SQL block - BOOLEAN params stay as local variables, not bound to .NET
+        const string plsqlBlock = @"
+            DECLARE
+                l_exito BOOLEAN;
+                l_mensaje VARCHAR2(4000);
+            BEGIN
+                PKG_CERTIFICADO_PARTICIPACION.P_OBTENER_DATOS_USUARIOS_ENVIO(
+                    PC_DATOS => :PC_DATOS,
+                    PB_EXITO => l_exito,
+                    PV_MENSAJE_ERROR => l_mensaje
+                );
+            END;";
+
+        var parameters = new OracleDynamicParameters();
+        parameters.Add("PC_DATOS", dbType: OracleMappingType.RefCursor, direction: ParameterDirection.Output);
+
+        return await _procedureRepository.QueryWithAnonymousBlockAsync<CertificateEmailDataDto>(plsqlBlock, parameters);
+    }
+
+    public async Task UpdateSendStatusAsync(Guid idCertificacion, bool envioExitoso, string? errorEnvio)
+    {
+        // Anonymous PL/SQL block - BOOLEAN params converted from NUMBER inside PL/SQL
+        const string plsqlBlock = @"
+            DECLARE
+                l_exito BOOLEAN;
+                l_mensaje VARCHAR2(4000);
+            BEGIN
+                PKG_CERTIFICADO_PARTICIPACION.P_ACTUALIZAR_ESTADO_ENVIO(
+                    PR_ID_CERTIFICACION => :PR_ID_CERTIFICACION,
+                    PB_ENVIO_EXITOSO => CASE WHEN :PB_ENVIO_EXITOSO = 1 THEN TRUE ELSE FALSE END,
+                    PV_ERROR_ENVIO => :PV_ERROR_ENVIO,
+                    PB_EXITO => l_exito,
+                    PV_MENSAJE_ERROR => l_mensaje
+                );
+            END;";
+
+        var parameters = new OracleDynamicParameters();
+        parameters.Add("PR_ID_CERTIFICACION", idCertificacion.ToByteArray(), OracleMappingType.Raw, ParameterDirection.Input);
+        parameters.Add("PB_ENVIO_EXITOSO", envioExitoso ? 1 : 0, OracleMappingType.Int32, ParameterDirection.Input);
+        parameters.Add("PV_ERROR_ENVIO", errorEnvio, OracleMappingType.Varchar2, ParameterDirection.Input);
+
+        await _procedureRepository.ExecuteAnonymousBlockAsync(plsqlBlock, parameters);
     }
 }

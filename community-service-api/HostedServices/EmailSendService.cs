@@ -21,11 +21,16 @@ public class EmailSendService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            var toNotify = await this.GetCertificates();
+            using var scope = this.serviceScopeFactory.CreateScope();
+
+            var certificacionParticipacionService = scope.ServiceProvider
+                .GetRequiredService<ICertificacionParticipacionService>();
+
+            var toNotify = await certificacionParticipacionService.GetCertificateEmailDataAsync();
 
             foreach (var item in toNotify)
             {
@@ -36,9 +41,12 @@ public class EmailSendService : BackgroundService
                         CertificateMailTemplate.GetCertificateMailTemplate(),
                         "Certificado Generado y Procesado - Community Service App",
                         item.Documento);
+
+                    await certificacionParticipacionService.UpdateSendStatusAsync(item.GetIdCertificacionAsGuid(), true, null);
                 }
                 catch (Exception ex)
                 {
+                    await certificacionParticipacionService.UpdateSendStatusAsync(item.GetIdCertificacionAsGuid(), false, ex.Message);
                 }
                 finally
                 {
@@ -73,15 +81,5 @@ public class EmailSendService : BackgroundService
         await client.AuthenticateAsync(this.emailSettings.GmailUser, this.emailSettings.GmailAppPassword);
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
-    }
-
-    public async Task<IEnumerable<CertificatePdfDataDto>> GetCertificates() 
-    {
-        using var scope = this.serviceScopeFactory.CreateScope();
-
-        var certificacionParticipacionService = scope.ServiceProvider
-            .GetRequiredService<ICertificacionParticipacionService>();
-
-        return await certificacionParticipacionService.GetCertificatePdfDataAsync("G");   
     }
 }
