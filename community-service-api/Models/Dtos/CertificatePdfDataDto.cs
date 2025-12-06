@@ -19,7 +19,6 @@ public class CertificatePdfDataDto
     public string IdentificacionVoluntario { get; set; } = null!;
     public string? Carrera { get; set; }
     public string? UniversidadVoluntario { get; set; }
-    public string? EmailVoluntario { get; set; }
 
     // Datos de la Actividad y Organización
     public string NombreActividad { get; set; } = null!;
@@ -28,9 +27,6 @@ public class CertificatePdfDataDto
 
     // Datos de Ubicación
     public string? LugarEvento { get; set; }
-
-    // PDF
-    public byte[]? Documento { get; set; }
 
     /// <summary>
     /// Convierte el ID_CERTIFICACION (RAW) a Guid.
