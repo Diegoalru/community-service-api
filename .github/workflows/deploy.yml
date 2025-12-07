@@ -1,0 +1,44 @@
+﻿name: Deploy .NET PROD (Self-Hosted)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    environment:
+      name: main
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./community-service-api/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/community-service-api:latest
+
+      - name: Update Container Production
+        run: |
+          cd /home/ubuntu/app
+          
+          echo "ASPNETCORE_ENVIRONMENT=Production" > .env
+          echo "ConnectionStrings__OracleConnection=${{ secrets.ORACLE_CONN_STRING }}" >> .env
+          echo "EmailSettings__SmtpServer=smtp.gmail.com" >> .env
+          echo "EmailSettings__Port=587" >> .env
+          echo "EmailSettings__GmailUser=${{ secrets.GMAIL_USER }}" >> .env
+          echo "EmailSettings__GmailAppPassword=${{ secrets.GMAIL_TOKEN }}" >> .env
+          
+          docker compose pull
+          docker compose up -d --remove-orphans
+          docker image prune -f
