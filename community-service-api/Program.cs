@@ -4,21 +4,21 @@ using community_service_api.Middleware;
 using community_service_api.Models;
 using community_service_api.Repositories;
 using community_service_api.Services;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
-using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Configure Oracle connection with wallet location
+// Configure Oracle connection with a wallet location
 var connectionString = builder.Configuration.GetConnectionString("OracleConnection");
 var walletPath = Path.Combine(AppContext.BaseDirectory, "Wallet");
 
 // Configure Oracle client to use the wallet
 OracleConfiguration.WalletLocation = walletPath;
 OracleConfiguration.TnsAdmin = walletPath;
-Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 builder.Services.AddDbContext<NewApplicationDbContext>(options =>
     options.UseOracle(connectionString));
@@ -53,8 +53,8 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
@@ -65,11 +65,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 var env = app.Environment;
 
-if (env.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
