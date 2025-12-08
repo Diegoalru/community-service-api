@@ -20,7 +20,7 @@ public class CertificationGenService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+        var timer = new PeriodicTimer(TimeSpan.FromMinutes(5));
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
