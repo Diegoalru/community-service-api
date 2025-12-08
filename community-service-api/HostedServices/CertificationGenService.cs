@@ -1,11 +1,10 @@
-using community_service_api.Models.DBTableEntities;
+using System.Globalization;
 using community_service_api.Models.Dtos;
 using community_service_api.Services;
 using QuestPDF;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using System.Globalization;
 
 namespace community_service_api.HostedServices;
 
@@ -21,7 +20,7 @@ public class CertificationGenService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromMinutes(30));
+        var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
@@ -35,6 +34,7 @@ public class CertificationGenService : BackgroundService
             }
             catch (Exception ex)
             {
+                // ignored
             }
         }
     }
@@ -51,27 +51,24 @@ public class CertificationGenService : BackgroundService
 
         foreach (var item in data)
         {
-            if (item != null)
-            {
-                var participantName = item.NombreVoluntario;
-                var organizationName = item.NombreOrganizacion;
-                var activityName = item.NombreActividad;
+            var participantName = item.NombreVoluntario;
+            var organizationName = item.NombreOrganizacion;
+            var activityName = item.NombreActividad;
 
-                var certificateBytes = BuildCertificatePdf(item, participantName, organizationName, activityName);
+            var certificateBytes = BuildCertificatePdf(item, participantName, organizationName, activityName);
 
-                // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
-                //var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
-                //Directory.CreateDirectory(certificatesDirectory);
+            // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
+            //var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
+            //Directory.CreateDirectory(certificatesDirectory);
 
-                //var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
-                //var filePath = Path.Combine(certificatesDirectory, fileName);
-                //File.WriteAllBytes(filePath, certificateBytes);
+            //var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
+            //var filePath = Path.Combine(certificatesDirectory, fileName);
+            //File.WriteAllBytes(filePath, certificateBytes);
 
-                await certificacionParticipacionService.SaveCertificateDocumentAsync(
-                    item.GetIdCertificacionAsGuid(),
-                    certificateBytes,
-                    cancellationToken);
-            }
+            await certificacionParticipacionService.SaveCertificateDocumentAsync(
+                item.GetIdCertificacionAsGuid(),
+                certificateBytes,
+                cancellationToken);
         }
     }
 
@@ -116,6 +113,8 @@ public class CertificationGenService : BackgroundService
                             {
                                 text.Span("Este certificado se otorga a ").FontSize(14);
                                 text.Span(participantName).FontSize(22).SemiBold();
+
+                                text.AlignCenter();
                             });
 
                             column.Item().Text($"Por su valiosa contribución a la actividad: {activityName}")
@@ -131,7 +130,7 @@ public class CertificationGenService : BackgroundService
                                     {
                                         text.Span("Horas totales: ").SemiBold();
                                         text.Span(certificado.HorasTotales.ToString(CultureInfo.InvariantCulture));
-                                        text.Line("Días totales: " + certificado.DiasTotales.ToString(CultureInfo.InvariantCulture));
+                                        text.Line(" Días totales: " + certificado.DiasTotales.ToString(CultureInfo.InvariantCulture));
                                         text.Line(
                                             $"Primera asistencia: {certificado.FechaInicio:dd 'de' MMMM yyyy}");
                                         text.Line(
@@ -146,25 +145,10 @@ public class CertificationGenService : BackgroundService
                                     stack.Item().Text("Datos del certificado").FontSize(14).SemiBold();
                                     stack.Item().PaddingTop(4).Text(text =>
                                     {
-                                        text.Line($"ID Certificación: {certificado.IdCertificacion}");
+                                        text.Line($"ID Certificación: {(certificado.IdCertificacion is { Length: 16 } raw16 ? new Guid(raw16).ToString() : BitConverter.ToString(certificado.IdCertificacion))}");
                                         text.Line($"Emitido el: {certificado.FechaEmisionTexto:dd 'de' MMMM yyyy}");
                                         text.Line($"Lugar: {certificado.LugarEvento}");
                                     });
-                                });
-                            });
-
-                            column.Item().PaddingTop(16).Row(row =>
-                            {
-                                row.RelativeItem().Column(col =>
-                                {
-                                    col.Item().Text("_____________________________").AlignCenter();
-                                    col.Item().Text("Representante de la organización").AlignCenter();
-                                });
-
-                                row.RelativeItem().Column(col =>
-                                {
-                                    col.Item().Text("_____________________________").AlignCenter();
-                                    col.Item().Text(participantName).AlignCenter();
                                 });
                             });
                         });

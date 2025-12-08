@@ -21,59 +21,51 @@ public interface ICertificacionParticipacionService
     Task UpdateSendStatusAsync(Guid idCertificacion, bool envioExitoso, string? errorEnvio);
 }
 
-public class CertificacionParticipacionService : ICertificacionParticipacionService
+public class CertificacionParticipacionService(
+    IRepository<CertificadoParticipacion> repository,
+    IProcedureRepository procedureRepository)
+    : ICertificacionParticipacionService
 {
-    private readonly IRepository<CertificadoParticipacion> _repository;
-    private readonly IProcedureRepository _procedureRepository;
-
-    public CertificacionParticipacionService(
-        IRepository<CertificadoParticipacion> repository,
-        IProcedureRepository procedureRepository)
-    {
-        _repository = repository;
-        _procedureRepository = procedureRepository;
-    }
-
     public async Task<IEnumerable<CertificacionParticipacionDto>> GetAllAsync()
     {
-        var entities = await _repository.GetAllAsync();
+        var entities = await repository.GetAllAsync();
         return entities.Select(e => e.ToDto());
     }
 
     public async Task<CertificacionParticipacionDto?> GetByIdAsync(Guid id)
     {
-        var entity = await _repository.GetByIdAsync(id);
+        var entity = await repository.GetByIdAsync(id);
         return entity?.ToDto();
     }
 
     public async Task<CertificacionParticipacionDto> CreateAsync(CertificacionParticipacionCreateDto dto)
     {
         var entity = dto.ToEntity();
-        var created = await _repository.AddAsync(entity);
+        var created = await repository.AddAsync(entity);
         return created.ToDto();
     }
 
     public async Task<bool> UpdateAsync(Guid id, CertificacionParticipacionUpdateDto dto)
     {
-        var entity = await _repository.GetByIdAsync(id);
+        var entity = await repository.GetByIdAsync(id);
         if (entity is null)
         {
             return false;
         }
 
         entity.UpdateFromDto(dto);
-        await _repository.UpdateAsync(entity);
+        await repository.UpdateAsync(entity);
         return true;
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        return await _repository.DeleteAsync(id);
+        return await repository.DeleteAsync(id);
     }
 
     public async Task<IEnumerable<CertificacionParticipacionDto>> GetPendingAsync() 
     {
-        var entities = await _repository.GetAllAsync();
+        var entities = await repository.GetAllAsync();
 
         var pendingEntities = entities.Where(e => e.Situacion.Equals("p", StringComparison.InvariantCultureIgnoreCase));
 
@@ -84,103 +76,66 @@ public class CertificacionParticipacionService : ICertificacionParticipacionServ
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        // Anonymous PL/SQL block - BOOLEAN params stay as local variables, not bound to .NET
-        const string plsqlBlock = @"
-            DECLARE
-                l_exito BOOLEAN;
-                l_mensaje VARCHAR2(4000);
-            BEGIN
-                PKG_CERTIFICADO_PARTICIPACION.P_ADJUNTAR_DOCUMENTO(
-                    PR_ID_CERTIFICACION => :PR_ID_CERTIFICACION,
-                    PB_DOCUMENTO => :PB_DOCUMENTO,
-                    PB_EXITO => l_exito,
-                    PV_MENSAJE_ERROR => l_mensaje
-                );
-            END;";
-
-        await _procedureRepository.BeginTransactionAsync();
+        await procedureRepository.BeginTransactionAsync();
 
         try
         {
             var parameters = new OracleDynamicParameters();
             parameters.Add("PR_ID_CERTIFICACION", idCertificacion.ToByteArray(), OracleMappingType.Raw, ParameterDirection.Input);
             parameters.Add("PB_DOCUMENTO", documento, OracleMappingType.Blob, ParameterDirection.Input);
+            parameters.Add("PN_EXITO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("PV_MENSAJE_ERROR", dbType: OracleMappingType.Varchar2, direction: ParameterDirection.Output, size: 4000);
 
-            await _procedureRepository.ExecuteAnonymousBlockAsync(plsqlBlock, parameters);
+            await procedureRepository.ExecuteAsync<int>(
+                "PKG_CERTIFICADO_PARTICIPACION.P_ADJUNTAR_DOCUMENTO",
+                parameters,
+                "PN_EXITO");
 
-            await _procedureRepository.CommitTransactionAsync();
+            await procedureRepository.CommitTransactionAsync();
         }
         catch
         {
-            await _procedureRepository.RollbackTransactionAsync();
+            await procedureRepository.RollbackTransactionAsync();
             throw;
         }
     }
 
     public async Task<IEnumerable<CertificatePdfDataDto>> GetCertificatePdfDataAsync()
     {
-        // Anonymous PL/SQL block - BOOLEAN params stay as local variables, not bound to .NET
-        const string plsqlBlock = @"
-            DECLARE
-                l_exito BOOLEAN;
-                l_mensaje VARCHAR2(4000);
-            BEGIN
-                PKG_CERTIFICADO_PARTICIPACION.P_OBTENER_DATOS_PDF(
-                    PC_DATOS => :PC_DATOS,
-                    PB_EXITO => l_exito,
-                    PV_MENSAJE_ERROR => l_mensaje
-                );
-            END;";
-
         var parameters = new OracleDynamicParameters();
         parameters.Add("PC_DATOS", dbType: OracleMappingType.RefCursor, direction: ParameterDirection.Output);
+        parameters.Add("PN_EXITO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+        parameters.Add("PV_MENSAJE_ERROR", dbType: OracleMappingType.Varchar2, direction: ParameterDirection.Output, size: 4000);
 
-        return await _procedureRepository.QueryWithAnonymousBlockAsync<CertificatePdfDataDto>(plsqlBlock, parameters);
+        return await procedureRepository.QueryAsync<CertificatePdfDataDto>(
+            "PKG_CERTIFICADO_PARTICIPACION.P_OBTENER_DATOS_PDF",
+            parameters);
     }
 
     public async Task<IEnumerable<CertificateEmailDataDto>> GetCertificateEmailDataAsync()
     {
-        // Anonymous PL/SQL block - BOOLEAN params stay as local variables, not bound to .NET
-        const string plsqlBlock = @"
-            DECLARE
-                l_exito BOOLEAN;
-                l_mensaje VARCHAR2(4000);
-            BEGIN
-                PKG_CERTIFICADO_PARTICIPACION.P_OBTENER_DATOS_USUARIOS_ENVIO(
-                    PC_DATOS => :PC_DATOS,
-                    PB_EXITO => l_exito,
-                    PV_MENSAJE_ERROR => l_mensaje
-                );
-            END;";
-
         var parameters = new OracleDynamicParameters();
         parameters.Add("PC_DATOS", dbType: OracleMappingType.RefCursor, direction: ParameterDirection.Output);
+        parameters.Add("PN_EXITO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+        parameters.Add("PV_MENSAJE_ERROR", dbType: OracleMappingType.Varchar2, direction: ParameterDirection.Output, size: 4000);
 
-        return await _procedureRepository.QueryWithAnonymousBlockAsync<CertificateEmailDataDto>(plsqlBlock, parameters);
+        return await procedureRepository.QueryAsync<CertificateEmailDataDto>(
+            "PKG_CERTIFICADO_PARTICIPACION.P_OBTENER_DATOS_USUARIOS_ENVIO",
+            parameters);
     }
 
     public async Task UpdateSendStatusAsync(Guid idCertificacion, bool envioExitoso, string? errorEnvio)
     {
-        // Anonymous PL/SQL block - BOOLEAN params converted from NUMBER inside PL/SQL
-        const string plsqlBlock = @"
-            DECLARE
-                l_exito BOOLEAN;
-                l_mensaje VARCHAR2(4000);
-            BEGIN
-                PKG_CERTIFICADO_PARTICIPACION.P_ACTUALIZAR_ESTADO_ENVIO(
-                    PR_ID_CERTIFICACION => :PR_ID_CERTIFICACION,
-                    PB_ENVIO_EXITOSO => CASE WHEN :PB_ENVIO_EXITOSO = 1 THEN TRUE ELSE FALSE END,
-                    PV_ERROR_ENVIO => :PV_ERROR_ENVIO,
-                    PB_EXITO => l_exito,
-                    PV_MENSAJE_ERROR => l_mensaje
-                );
-            END;";
-
         var parameters = new OracleDynamicParameters();
         parameters.Add("PR_ID_CERTIFICACION", idCertificacion.ToByteArray(), OracleMappingType.Raw, ParameterDirection.Input);
-        parameters.Add("PB_ENVIO_EXITOSO", envioExitoso ? 1 : 0, OracleMappingType.Int32, ParameterDirection.Input);
+        parameters.Add("PN_ENVIO_EXITOSO", envioExitoso ? 1 : 0, OracleMappingType.Int32, ParameterDirection.Input);
         parameters.Add("PV_ERROR_ENVIO", errorEnvio, OracleMappingType.Varchar2, ParameterDirection.Input);
+        parameters.Add("PN_EXITO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+        parameters.Add("PV_MENSAJE_ERROR", dbType: OracleMappingType.Varchar2, direction: ParameterDirection.Output, size: 4000);
 
-        await _procedureRepository.ExecuteAnonymousBlockAsync(plsqlBlock, parameters);
+        await procedureRepository.ExecuteAsync<int>(
+            "PKG_CERTIFICADO_PARTICIPACION.P_ACTUALIZAR_ESTADO_ENVIO",
+            parameters,
+            "PN_EXITO");
     }
 }
