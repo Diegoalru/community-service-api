@@ -1,6 +1,5 @@
 using community_service_api.MailTemplates;
 using community_service_api.Models;
-using community_service_api.Models.Dtos;
 using community_service_api.Services;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
@@ -8,16 +7,10 @@ using MimeKit;
 
 namespace community_service_api.HostedServices;
 
-public class EmailSendService : BackgroundService
+public class EmailSendService(IServiceScopeFactory serviceScopeFactory, IOptions<EmailSettings> emailSettings)
+    : BackgroundService
 {
-    private readonly IServiceScopeFactory serviceScopeFactory;
-    private readonly EmailSettings emailSettings;
-
-    public EmailSendService(IServiceScopeFactory serviceScopeFactory, IOptions<EmailSettings> emailSettings)
-    {
-        this.serviceScopeFactory = serviceScopeFactory;
-        this.emailSettings = emailSettings.Value;
-    }
+    private readonly EmailSettings _emailSettings = emailSettings.Value;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -25,7 +18,7 @@ public class EmailSendService : BackgroundService
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            using var scope = this.serviceScopeFactory.CreateScope();
+            using var scope = serviceScopeFactory.CreateScope();
 
             var certificacionParticipacionService = scope.ServiceProvider
                 .GetRequiredService<ICertificacionParticipacionService>();
@@ -36,6 +29,12 @@ public class EmailSendService : BackgroundService
             {
                 try
                 {
+                    if (item.Documento == null || item.Documento.Length == 0)
+                    {
+                        await certificacionParticipacionService.UpdateSendStatusAsync(item.GetIdCertificacionAsGuid(), false, "PDF document is not available");
+                        continue;
+                    }
+
                     await SendEmailAsync(
                         item.EmailVoluntario,
                         CertificateMailTemplate.GetCertificateMailTemplate(),
@@ -57,10 +56,10 @@ public class EmailSendService : BackgroundService
         }
     }
 
-    public async Task SendEmailAsync(string recipientEmail, string mailTemplate, string subject, byte[] pdfAttachment)
+    private async Task SendEmailAsync(string recipientEmail, string mailTemplate, string subject, byte[] pdfAttachment)
     {
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress("Community Service App - Online Services", this.emailSettings.GmailUser));
+        message.From.Add(new MailboxAddress("Community Service App - Online Services", this._emailSettings.GmailUser));
         message.To.Add(new MailboxAddress("", recipientEmail));
         message.Subject = subject;
 
@@ -77,8 +76,8 @@ public class EmailSendService : BackgroundService
         message.Body = bodyBuilder.ToMessageBody();
 
         using var client = new SmtpClient();
-        await client.ConnectAsync(this.emailSettings.SmtpServer, this.emailSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
-        await client.AuthenticateAsync(this.emailSettings.GmailUser, this.emailSettings.GmailAppPassword);
+        await client.ConnectAsync(this._emailSettings.SmtpServer, this._emailSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(this._emailSettings.GmailUser, this._emailSettings.GmailAppPassword);
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
     }
