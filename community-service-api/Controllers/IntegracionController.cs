@@ -10,25 +10,38 @@ namespace community_service_api.Controllers;
 [Route("api/[controller]")]
 public class IntegracionController(IIntegracionService integracionService) : ControllerBase
 {
-    [HttpPost("register")]
+    private const string UsuarioRegistradoExitosamenteMensaje = "Usuario registrado exitosamente. Por favor verifique su correo.";
+
+    [HttpPost("Register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RegistrarCompleto([FromBody] RegistroCompletoDto dto)
     {
-        var respuesta = await integracionService.RegistrarUsuarioCompletoAsync(dto);
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        if (respuesta.Codigo == 0)
+        RespuestaRegistro respuesta;
+        
+        try
         {
-            // TODO: Aquí integrarías tu servicio de Email (SendGrid/SMTP)
-            // EnviarEmail(destinatario: dto.Correspondencia..., token: respuesta.Token);
-            
-            return Ok(new { 
-                mensaje = "Usuario registrado exitosamente. Por favor verifique su correo.", 
-                idUsuario = respuesta.IdUsuario,
-                // token = respuesta.Token // Opcional: devolverlo solo en desarrollo
-            });
+            respuesta = await integracionService.RegistrarUsuarioCompletoAsync(dto);
         }
-        else
+        catch (Exception ex)
         {
-            return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error interno al procesar la solicitud.", detalle = ex.Message });
         }
+
+        return respuesta.Codigo switch
+        {
+            0 => Ok(new
+            {
+                mensaje = UsuarioRegistradoExitosamenteMensaje,
+                token = respuesta.Token,
+                idUsuario = respuesta.IdUsuario
+            }),
+            -1 => StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo }),
+            _ => BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo })
+        };
     }
 }

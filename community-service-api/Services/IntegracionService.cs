@@ -15,28 +15,47 @@ public class IntegracionService(IProcedureRepository procedureRepository) : IInt
 {
     public async Task<RespuestaRegistro> RegistrarUsuarioCompletoAsync(RegistroCompletoDto dto)
     {
-        // Serializar a JSON
-        var jsonPayload = JsonSerializer.Serialize(dto);
+        await procedureRepository.BeginTransactionAsync();
 
-        var dyParam = new OracleDynamicParameters();
-        dyParam.Add("CV_DATOS", jsonPayload, OracleMappingType.Clob, ParameterDirection.Input);
-
-        // Parámetros de Salida
-        dyParam.Add("PN_ID_USUARIO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
-        dyParam.Add("PV_TOKEN", dbType: OracleMappingType.Varchar2, size: 2000, direction: ParameterDirection.Output);
-        dyParam.Add("PB_EXITO", dbType: OracleMappingType.Byte, direction: ParameterDirection.Output);
-        dyParam.Add("PV_MENSAJE", dbType: OracleMappingType.Varchar2, size: 2000, direction: ParameterDirection.Output);
-        dyParam.Add("PN_CODIGO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
-
-        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_REGISTRO_USUARIO_JSON", dyParam);
-
-        return new RespuestaRegistro
+        try
         {
-            IdUsuario = dyParam.Get<int?>("PN_ID_USUARIO"),
-            Token = dyParam.Get<string>("PV_TOKEN"),
-            Mensaje = dyParam.Get<string>("PV_MENSAJE"),
-            Codigo = dyParam.Get<int>("PN_CODIGO")
-        };
+            var jsonPayload = JsonSerializer.Serialize(dto);
+
+            var dyParam = new OracleDynamicParameters();
+            
+            dyParam.Add("CV_DATOS", jsonPayload, OracleMappingType.Clob, ParameterDirection.Input);
+
+            dyParam.Add("PN_ID_USUARIO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+            dyParam.Add("PV_TOKEN", dbType: OracleMappingType.Varchar2, size: 2000, direction: ParameterDirection.Output);
+            dyParam.Add("PN_EXITO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+            dyParam.Add("PV_MENSAJE", dbType: OracleMappingType.Varchar2, size: 2000, direction: ParameterDirection.Output);
+            dyParam.Add("PN_CODIGO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_REGISTRO_USUARIO_JSON", dyParam);
+
+            var response = new RespuestaRegistro
+            {
+                IdUsuario = dyParam.Get<int?>("PN_ID_USUARIO"),
+                Token = dyParam.Get<string>("PV_TOKEN"),
+                Exito = dyParam.Get<int>("PN_EXITO"),
+                Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty,
+                Codigo = dyParam.Get<int>("PN_CODIGO")
+            };
+
+            await procedureRepository.CommitTransactionAsync();
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+
+            return new RespuestaRegistro
+            {
+                Codigo = -1,
+                Mensaje = $"Ocurrió un error al registrar el usuario. {ex.Message}"
+            };
+        }
     }
 }
 
@@ -44,6 +63,7 @@ public class IntegracionService(IProcedureRepository procedureRepository) : IInt
 public class RespuestaRegistro
 {
     public int Codigo { get; set; }
+    public int Exito { get; set; }
     public string Mensaje { get; set; } = string.Empty;
     public int? IdUsuario { get; set; }
     public string? Token { get; set; }
