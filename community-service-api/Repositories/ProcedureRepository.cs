@@ -146,6 +146,37 @@ public class ProcedureRepository(NewApplicationDbContext context) : IProcedureRe
     }
 
     /// <summary>
+    ///     Ejecuta un procedimiento almacenado sin esperar un valor de retorno directo,
+    ///     permitiendo leer múltiples parámetros OUT del objeto parameters después.
+    /// </summary>
+    public async Task ExecuteVoidAsync(string procedureName, OracleDynamicParameters parameters)
+    {
+        var connection = context.Database.GetDbConnection();
+        await EnsureOpenAsync(connection);
+
+        if (connection is OracleConnection oc)
+            oc.BindByName = true;
+
+        try
+        {
+            await connection.ExecuteAsync(
+                procedureName,
+                parameters,
+                _transaction,
+                commandType: CommandType.StoredProcedure
+            );
+        }
+        catch (OracleException ex) when (IsAppError(ex))
+        {
+            throw new BusinessRuleException(CleanOracleMessage(ex.Message), ex);
+        }
+        catch (OracleException ex)
+        {
+            throw new DataAccessException(MapOracleError(ex), ex);
+        }
+    }
+
+    /// <summary>
     ///     Ejecuta un bloque PL/SQL anónimo y devuelve los resultados del cursor de salida.
     ///     Útil para procedimientos con parámetros BOOLEAN que no pueden ser bindeados directamente desde .NET.
     /// </summary>
