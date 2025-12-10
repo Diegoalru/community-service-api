@@ -17,6 +17,8 @@ public class PerfilDto
 
     public DateTime FechaNacimiento { get; set; }
 
+    public string? Carrera { get; set; }
+
     public string? Bibliografia { get; set; }
 
     public char Estado { get; set; }
@@ -32,6 +34,8 @@ public class PerfilCreateDto
 
     [Required]
     public int IdIdentificador { get; set; }
+
+    public int? IdUniversidad { get; set; }
 
     [Required]
     [MaxLength(100)]
@@ -50,6 +54,9 @@ public class PerfilCreateDto
 
     [Required]
     public DateTime FechaNacimiento { get; set; }
+
+    [MaxLength(100)]
+    public string? Carrera { get; set; }
 
     [MaxLength(2000)]
     public string? Bibliografia { get; set; }

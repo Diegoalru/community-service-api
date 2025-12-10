@@ -9,6 +9,16 @@ public class UsuarioDto
 
     public string Username { get; set; } = string.Empty;
 
+    public char Restablecer { get; set; }
+
+    public int IntentosFallidos { get; set; }
+
+    public DateTime? FechaDesbloqueo { get; set; }
+
+    public char TokenEstado { get; set; }
+
+    public DateTime? TokenExpiracion { get; set; }
+
     public char Estado { get; set; }
 }
 
@@ -22,6 +32,21 @@ public class UsuarioCreateDto
     [MinLength(6)]
     [MaxLength(255)]
     public string Password { get; set; } = string.Empty;
+
+    [RegularExpression("[NS]")]
+    public char Restablecer { get; set; } = 'N';
+
+    public int IntentosFallidos { get; set; } = 0;
+
+    public DateTime? FechaDesbloqueo { get; set; }
+
+    [MaxLength(255)]
+    public string? Token { get; set; }
+
+    [RegularExpression("[PVEI]")]
+    public char TokenEstado { get; set; } = 'V';
+
+    public DateTime? TokenExpiracion { get; set; }
 
     public DateTime? FechaDesde { get; set; }
 

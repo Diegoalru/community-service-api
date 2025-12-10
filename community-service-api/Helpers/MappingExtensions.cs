@@ -6,10 +6,16 @@ namespace community_service_api.Helpers;
 
 public static class MappingExtensions
 {
+    // Usuario mappings
     public static UsuarioDto ToDto(this Usuario entity) => new()
     {
         IdUsuario = entity.IdUsuario,
         Username = entity.Username,
+        Restablecer = entity.Restablecer[0],
+        IntentosFallidos = entity.IntentosFallidos,
+        FechaDesbloqueo = entity.FechaDesbloqueo,
+        TokenEstado = entity.TokenEstado[0],
+        TokenExpiracion = entity.TokenExpiracion,
         Estado = entity.Estado[0]
     };
 
@@ -17,6 +23,12 @@ public static class MappingExtensions
     {
         Username = dto.Username,
         Password = dto.Password,
+        Restablecer = char.ToString(dto.Restablecer),
+        IntentosFallidos = dto.IntentosFallidos,
+        FechaDesbloqueo = dto.FechaDesbloqueo,
+        Token = dto.Token,
+        TokenEstado = char.ToString(dto.TokenEstado),
+        TokenExpiracion = dto.TokenExpiracion,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
         Estado = char.ToString(dto.Estado)
@@ -26,11 +38,18 @@ public static class MappingExtensions
     {
         entity.Username = dto.Username;
         entity.Password = dto.Password;
+        entity.Restablecer = char.ToString(dto.Restablecer);
+        entity.IntentosFallidos = dto.IntentosFallidos;
+        entity.FechaDesbloqueo = dto.FechaDesbloqueo;
+        entity.Token = dto.Token;
+        entity.TokenEstado = char.ToString(dto.TokenEstado);
+        entity.TokenExpiracion = dto.TokenExpiracion;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // TipoIdentificador mappings
     public static TipoIdentificadorDto ToDto(this TipoIdentificador entity) => new()
     {
         IdIdentificador = entity.IdIdentificador,
@@ -54,6 +73,7 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // Pais mappings
     public static PaisDto ToDto(this Pais entity) => new()
     {
         IdPais = entity.IdPais,
@@ -77,6 +97,34 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // Universidad mappings
+    public static UniversidadDto ToDto(this Universidad entity) => new()
+    {
+        IdUniversidad = entity.IdUniversidad,
+        Nombre = entity.Nombre,
+        Siglas = entity.Siglas,
+        Estado = entity.Estado[0]
+    };
+
+    public static Universidad ToEntity(this UniversidadCreateDto dto) => new()
+    {
+        Nombre = dto.Nombre,
+        Siglas = dto.Siglas,
+        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+        FechaHasta = dto.FechaHasta,
+        Estado = char.ToString(dto.Estado)
+    };
+
+    public static void UpdateFromDto(this Universidad entity, UniversidadUpdateDto dto)
+    {
+        entity.Nombre = dto.Nombre;
+        entity.Siglas = dto.Siglas;
+        entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
+        entity.FechaHasta = dto.FechaHasta;
+        entity.Estado = char.ToString(dto.Estado);
+    }
+
+    // Perfil mappings
     public static PerfilDto ToDto(this Perfil entity) => new()
     {
         IdPerfil = entity.IdPerfil,
@@ -85,6 +133,7 @@ public static class MappingExtensions
         ApellidoP = entity.ApellidoP,
         ApellidoM = entity.ApellidoM,
         FechaNacimiento = entity.FechaNacimiento,
+        Carrera = entity.Carrera,
         Bibliografia = entity.Bibliografia,
         Estado = entity.Estado[0]
     };
@@ -94,11 +143,13 @@ public static class MappingExtensions
         IdUsuario = dto.IdUsuario,
         IdUbicacion = dto.IdUbicacion,
         IdIdentificador = dto.IdIdentificador,
+        IdUniversidad = dto.IdUniversidad,
         Identificacion = dto.Identificacion,
         Nombre = dto.Nombre,
         ApellidoP = dto.ApellidoP,
         ApellidoM = dto.ApellidoM,
         FechaNacimiento = dto.FechaNacimiento,
+        Carrera = dto.Carrera,
         Bibliografia = dto.Bibliografia,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
@@ -110,25 +161,25 @@ public static class MappingExtensions
         entity.IdUsuario = dto.IdUsuario;
         entity.IdUbicacion = dto.IdUbicacion;
         entity.IdIdentificador = dto.IdIdentificador;
+        entity.IdUniversidad = dto.IdUniversidad;
         entity.Identificacion = dto.Identificacion;
         entity.Nombre = dto.Nombre;
         entity.ApellidoP = dto.ApellidoP;
         entity.ApellidoM = dto.ApellidoM;
         entity.FechaNacimiento = dto.FechaNacimiento;
+        entity.Carrera = dto.Carrera;
         entity.Bibliografia = dto.Bibliografia;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // Organizacion mappings
     public static OrganizacionDto ToDto(this Organizacion entity) => new()
     {
         IdOrganizacion = entity.IdOrganizacion,
         Nombre = entity.Nombre,
         Descripcion = entity.Descripcion,
-        Email = entity.Email,
-        Telefono = entity.Telefono,
-        SitioWeb = entity.SitioWeb,
         Estado = entity.Estado[0]
     };
 
@@ -136,11 +187,9 @@ public static class MappingExtensions
     {
         IdUsuarioCreador = dto.IdUsuarioCreador,
         IdUbicacion = dto.IdUbicacion,
+        IdUniversidad = dto.IdUniversidad,
         Nombre = dto.Nombre,
         Descripcion = dto.Descripcion,
-        Email = dto.Email,
-        Telefono = dto.Telefono,
-        SitioWeb = dto.SitioWeb,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
         Estado = char.ToString(dto.Estado)
@@ -150,16 +199,15 @@ public static class MappingExtensions
     {
         entity.IdUsuarioCreador = dto.IdUsuarioCreador;
         entity.IdUbicacion = dto.IdUbicacion;
+        entity.IdUniversidad = dto.IdUniversidad;
         entity.Nombre = dto.Nombre;
         entity.Descripcion = dto.Descripcion;
-        entity.Email = dto.Email;
-        entity.Telefono = dto.Telefono;
-        entity.SitioWeb = dto.SitioWeb;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // Rol mappings
     public static RolDto ToDto(this Rol entity) => new()
     {
         IdRol = entity.IdRol,
@@ -183,9 +231,11 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // RolUsuarioOrganizacion mappings
     public static RolUsuarioOrganizacionDto ToDto(this RolUsuarioOrganizacion entity) => new()
     {
         IdRolUsuarioOrganizacion = entity.IdRolUsuarioOrganizacion,
+        EsActivo = entity.EsActivo[0],
         Estado = entity.Estado[0]
     };
 
@@ -195,6 +245,7 @@ public static class MappingExtensions
         IdUsuarioAsignado = dto.IdUsuarioAsignado,
         IdUsuarioAdministrador = dto.IdUsuarioAdministrador,
         IdRol = dto.IdRol,
+        EsActivo = char.ToString(dto.EsActivo),
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
         Estado = char.ToString(dto.Estado)
@@ -206,11 +257,13 @@ public static class MappingExtensions
         entity.IdUsuarioAsignado = dto.IdUsuarioAsignado;
         entity.IdUsuarioAdministrador = dto.IdUsuarioAdministrador;
         entity.IdRol = dto.IdRol;
+        entity.EsActivo = char.ToString(dto.EsActivo);
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // CategoriaActividad mappings
     public static CategoriaActividadDto ToDto(this CategoriaActividad entity) => new()
     {
         IdCategoriaActividad = entity.IdCategoriaActividad,
@@ -234,6 +287,7 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // Actividad mappings
     public static ActividadDto ToDto(this Actividad entity) => new()
     {
         IdActividad = entity.IdActividad,
@@ -283,6 +337,7 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // CoordinadorActividad mappings
     public static CoordinadorActividadDto ToDto(this CoordinadorActividad entity) => new()
     {
         IdCoordinadorActividad = entity.IdCoordinadorActividad,
@@ -309,6 +364,7 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // HorarioActividad mappings
     public static HorarioActividadDto ToDto(this HorarioActividad entity) => new()
     {
         IdHorarioActividad = entity.IdHorarioActividad,
@@ -350,6 +406,7 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // ParticipanteActividad mappings
     public static ParticipanteActividadDto ToDto(this ParticipanteActividad entity) => new()
     {
         IdParticipanteActividad = entity.IdParticipanteActividad,
@@ -387,6 +444,7 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
+    // CertificadoParticipacion mappings
     public static CertificacionParticipacionDto ToDto(this CertificadoParticipacion entity) => new()
     {
         IdCertificacion = entity.IdCertificacion,

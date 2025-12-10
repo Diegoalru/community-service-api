@@ -12,6 +12,8 @@ public partial class Perfil
 
     public int IdIdentificador { get; set; }
 
+    public int? IdUniversidad { get; set; }
+
     public string Identificacion { get; set; } = null!;
 
     public string Nombre { get; set; } = null!;
@@ -21,6 +23,8 @@ public partial class Perfil
     public string? ApellidoM { get; set; }
 
     public DateTime FechaNacimiento { get; set; }
+
+    public string? Carrera { get; set; }
 
     public string? Bibliografia { get; set; }
 
@@ -35,4 +39,6 @@ public partial class Perfil
     public virtual Ubicacion IdUbicacionNavigation { get; set; } = null!;
 
     public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
+
+    public virtual Universidad? IdUniversidadNavigation { get; set; }
 }
