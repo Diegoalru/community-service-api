@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace community_service_api.Models.DBTableEntities;
 
@@ -14,6 +13,8 @@ public partial class RolUsuarioOrganizacion
     public int IdUsuarioAdministrador { get; set; }
 
     public int IdRol { get; set; }
+
+    public string EsActivo { get; set; } = null!;
 
     public DateTime FechaDesde { get; set; }
 

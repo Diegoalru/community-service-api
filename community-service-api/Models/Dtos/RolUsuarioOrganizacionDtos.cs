@@ -7,6 +7,8 @@ public class RolUsuarioOrganizacionDto
 {
     public int IdRolUsuarioOrganizacion { get; set; }
 
+    public char EsActivo { get; set; }
+
     public char Estado { get; set; }
 }
 
@@ -23,6 +25,10 @@ public class RolUsuarioOrganizacionCreateDto
 
     [Required]
     public int IdRol { get; set; }
+
+    [Required]
+    [RegularExpression("[AI]")]
+    public char EsActivo { get; set; } = 'A';
 
     public DateTime? FechaDesde { get; set; }
 

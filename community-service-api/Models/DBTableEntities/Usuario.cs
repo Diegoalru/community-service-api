@@ -11,6 +11,18 @@ public partial class Usuario
 
     public string Password { get; set; } = null!;
 
+    public string Restablecer { get; set; } = null!;
+
+    public int IntentosFallidos { get; set; }
+
+    public DateTime? FechaDesbloqueo { get; set; }
+
+    public string? Token { get; set; }
+
+    public string TokenEstado { get; set; } = null!;
+
+    public DateTime? TokenExpiracion { get; set; }
+
     public DateTime FechaDesde { get; set; }
 
     public DateTime? FechaHasta { get; set; }

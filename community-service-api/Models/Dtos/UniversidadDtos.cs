@@ -3,34 +3,26 @@ using System.ComponentModel.DataAnnotations;
 
 namespace community_service_api.Models.Dtos;
 
-public class OrganizacionDto
+public class UniversidadDto
 {
-    public int IdOrganizacion { get; set; }
+    public int IdUniversidad { get; set; }
 
     public string Nombre { get; set; } = string.Empty;
 
-    public string Descripcion { get; set; } = string.Empty;
+    public string Siglas { get; set; } = string.Empty;
 
     public char Estado { get; set; }
 }
 
-public class OrganizacionCreateDto
+public class UniversidadCreateDto
 {
-    [Required]
-    public int IdUsuarioCreador { get; set; }
-
-    [Required]
-    public int IdUbicacion { get; set; }
-
-    public int? IdUniversidad { get; set; }
-
     [Required]
     [MaxLength(255)]
     public string Nombre { get; set; } = string.Empty;
 
     [Required]
-    [MaxLength(255)]
-    public string Descripcion { get; set; } = string.Empty;
+    [MaxLength(20)]
+    public string Siglas { get; set; } = string.Empty;
 
     public DateTime? FechaDesde { get; set; }
 
@@ -41,6 +33,7 @@ public class OrganizacionCreateDto
     public char Estado { get; set; }
 }
 
-public class OrganizacionUpdateDto : OrganizacionCreateDto
+public class UniversidadUpdateDto : UniversidadCreateDto
 {
 }
+

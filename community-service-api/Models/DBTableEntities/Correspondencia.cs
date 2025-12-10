@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace community_service_api.Models.DBTableEntities;
 
@@ -7,7 +6,9 @@ public partial class Correspondencia
 {
     public int IdCorrespondencia { get; set; }
 
-    public int IdUsuario { get; set; }
+    public int? IdUsuario { get; set; }
+
+    public int? IdOrganizacion { get; set; }
 
     public int IdTipoCorrespondencia { get; set; }
 
@@ -23,5 +24,7 @@ public partial class Correspondencia
 
     public virtual TipoCorrespondencia IdTipoCorrespondenciaNavigation { get; set; } = null!;
 
-    public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
+    public virtual Usuario? IdUsuarioNavigation { get; set; }
+
+    public virtual Organizacion? IdOrganizacionNavigation { get; set; }
 }

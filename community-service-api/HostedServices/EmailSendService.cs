@@ -14,7 +14,7 @@ public class EmailSendService(IServiceScopeFactory serviceScopeFactory, IOptions
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
