@@ -20,7 +20,7 @@ public interface IUsuarioService
     Task<bool> DeleteAsync(int id);
 }
 
-public class UsuarioService(IRepository<Usuario> repository, IProcedureRepository procedureRepository)
+public class UsuarioService(IRepository<Usuario> repository)
     : IUsuarioService
 {
     public async Task<IEnumerable<UsuarioDto>> GetAllAsync()

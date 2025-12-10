@@ -1,3 +1,9 @@
+using System.Data;
+using System.Text.Json;
+using community_service_api.Models.Dtos;
+using community_service_api.Repositories;
+using Dapper.Oracle;
+
 namespace community_service_api.Services;
 
 public interface IIntegracionService
@@ -5,30 +11,16 @@ public interface IIntegracionService
     Task<RespuestaRegistro> RegistrarUsuarioCompletoAsync(RegistroCompletoDto dto);
 }
 
-public class IntegracionService : IIntegracionService
+public class IntegracionService(IProcedureRepository procedureRepository) : IIntegracionService
 {
-    private readonly IUsuarioService _usuarioService;
-    private readonly IPerfilService _perfilService;
-    private readonly INotificacionService _notificacionService;
-
-    public IntegracionService(
-        IUsuarioService usuarioService,
-        IPerfilService perfilService,
-        INotificacionService notificacionService)
-    {
-        _usuarioService = usuarioService;
-        _perfilService = perfilService;
-        _notificacionService = notificacionService;
-    }
-
     public async Task<RespuestaRegistro> RegistrarUsuarioCompletoAsync(RegistroCompletoDto dto)
     {
         // Serializar a JSON
-        var jsonPayload = System.Text.Json.JsonSerializer.Serialize(dto);
+        var jsonPayload = JsonSerializer.Serialize(dto);
 
         var dyParam = new OracleDynamicParameters();
         dyParam.Add("CV_DATOS", jsonPayload, OracleMappingType.Clob, ParameterDirection.Input);
-        
+
         // Parámetros de Salida
         dyParam.Add("PN_ID_USUARIO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
         dyParam.Add("PV_TOKEN", dbType: OracleMappingType.Varchar2, size: 2000, direction: ParameterDirection.Output);
@@ -49,14 +41,16 @@ public class IntegracionService : IIntegracionService
 }
 
 // Clases de respuesta auxiliares
-public class RespuestaRegistro {
+public class RespuestaRegistro
+{
     public int Codigo { get; set; }
     public string Mensaje { get; set; } = string.Empty;
     public int? IdUsuario { get; set; }
     public string? Token { get; set; }
 }
 
-public class RespuestaReenvio {
+public class RespuestaReenvio
+{
     public int Codigo { get; set; }
     public string Mensaje { get; set; } = string.Empty;
     public string? Email { get; set; }

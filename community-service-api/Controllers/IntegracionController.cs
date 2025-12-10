@@ -8,19 +8,12 @@ namespace community_service_api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class IntegracionController : ControllerBase
+public class IntegracionController(IIntegracionService integracionService) : ControllerBase
 {
-    private readonly IIntegracionService _integracionService;
-
-    public IntegracionController(IIntegracionService integracionService)
-    {
-        _integracionService = integracionService;
-    }
-
     [HttpPost("register")]
     public async Task<IActionResult> RegistrarCompleto([FromBody] RegistroCompletoDto dto)
     {
-        var respuesta = await usuarioService.RegistrarUsuarioCompletoAsync(dto);
+        var respuesta = await integracionService.RegistrarUsuarioCompletoAsync(dto);
 
         if (respuesta.Codigo == 0)
         {

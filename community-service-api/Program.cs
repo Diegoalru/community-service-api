@@ -40,6 +40,7 @@ builder.Services.AddScoped<IHorarioActividadService, HorarioActividadService>();
 builder.Services.AddScoped<IParticipanteActividadService, ParticipanteActividadService>();
 builder.Services.AddScoped<ICertificacionParticipacionService, CertificacionParticipacionService>();
 builder.Services.AddScoped<IUniversidadService, UniversidadService>();
+builder.Services.AddScoped<IIntegracionService, IntegracionService>();
 builder.Services.AddScoped<IProcedureRepository, ProcedureRepository>();
 builder.Services.AddHostedService<CertificationGenService>();
 builder.Services.AddHostedService<EmailSendService>();
