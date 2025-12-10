@@ -57,7 +57,7 @@ public class UsuarioCreateDto
     public char Estado { get; set; }
 }
 
-public class UsuarioCreateDtoTest
+public class UsuarioLoginDto
 {
     [Required]
     [MaxLength(200)]

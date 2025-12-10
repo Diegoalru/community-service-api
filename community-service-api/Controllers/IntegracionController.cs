@@ -11,21 +11,22 @@ namespace community_service_api.Controllers;
 public class IntegracionController(IIntegracionService integracionService) : ControllerBase
 {
     private const string UsuarioRegistradoExitosamenteMensaje = "Usuario registrado exitosamente. Por favor verifique su correo.";
-
-    [HttpPost("Register")]
+    private const string UsuarioInicioSesionExitosamenteMensaje = "Inicio de sesión exitoso.";
+    
+    [HttpPost("RegistroUsuario")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> RegistrarCompleto([FromBody] RegistroCompletoDto dto)
+    public async Task<IActionResult> RegistroUsuario([FromBody] RegistroCompletoDto dto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        RespuestaRegistro respuesta;
+        Respuesta respuesta;
         
         try
         {
-            respuesta = await integracionService.RegistrarUsuarioCompletoAsync(dto);
+            respuesta = await integracionService.RegistroUsuarioCompletoAsync(dto);
         }
         catch (Exception ex)
         {
@@ -44,4 +45,37 @@ public class IntegracionController(IIntegracionService integracionService) : Con
             _ => BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo })
         };
     }
+
+    [HttpPost("IniciarSesion")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> IniciarSesion([FromBody] UsuarioLoginDto dto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        Respuesta respuesta;
+        
+        try
+        {
+            respuesta = await integracionService.InicioSesionAsync(dto);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error interno al procesar la solicitud.", detalle = ex.Message });
+        }
+
+        return respuesta.Exito switch
+        {
+            1 => Ok(new
+            {
+                mensaje = UsuarioInicioSesionExitosamenteMensaje,
+                idUsuario = respuesta.IdUsuario
+            }),
+            -1 => StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo }),
+            _ => BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo })
+        };
+    }
+    
 }
