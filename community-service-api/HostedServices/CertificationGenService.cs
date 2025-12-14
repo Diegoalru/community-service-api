@@ -46,8 +46,9 @@ public class CertificationGenService : BackgroundService
         using var scope = _serviceScopeFactory.CreateScope();
         var certificacionParticipacionService = scope.ServiceProvider
             .GetRequiredService<ICertificacionParticipacionService>();
+        var emailQueueService = scope.ServiceProvider.GetRequiredService<IEmailQueueService>();
 
-        var data = await certificacionParticipacionService.GetCertificatePdfDataAsync();
+        var data = await certificacionParticipacionService.GetCertificateGenerationDataAsync();
 
         foreach (var item in data)
         {
@@ -57,23 +58,27 @@ public class CertificationGenService : BackgroundService
 
             var certificateBytes = BuildCertificatePdf(item, participantName, organizationName, activityName);
 
-            // Example of persisting to disk (you could also persist the byte[] directly to a database BLOB column)
-            //var certificatesDirectory = Path.Combine(AppContext.BaseDirectory, "certificates");
-            //Directory.CreateDirectory(certificatesDirectory);
-
-            //var fileName = $"certificate_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
-            //var filePath = Path.Combine(certificatesDirectory, fileName);
-            //File.WriteAllBytes(filePath, certificateBytes);
-
             await certificacionParticipacionService.SaveCertificateDocumentAsync(
                 item.GetIdCertificacionAsGuid(),
                 certificateBytes,
                 cancellationToken);
+
+            if (!string.IsNullOrEmpty(item.EmailVoluntario))
+            {
+                await emailQueueService.EnqueueEmailAsync(
+                    item.EmailVoluntario,
+                    "Certificado Generado y Procesado - Community Service App",
+                    community_service_api.MailTemplates.CertificateMailTemplate.GetCertificateMailTemplate(),
+                    idUsuario: item.IdUsuarioVoluntario,
+                    attachment: certificateBytes,
+                    attachmentName: "Certificado_Participacion.pdf",
+                    idCertificacion: item.GetIdCertificacionAsGuid());
+            }
         }
     }
 
     private static byte[] BuildCertificatePdf(
-        CertificatePdfDataDto certificado,
+        CertificateGenerationDataDto certificado,
         string participantName,
         string organizationName,
         string activityName)

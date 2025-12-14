@@ -1,6 +1,6 @@
 ﻿namespace community_service_api.MailTemplates
 {
-    public class CertificateMailTemplate
+    public static class CertificateMailTemplate
     {
         public static string GetCertificateMailTemplate()
         {
