@@ -65,6 +65,7 @@ jobs:
           echo "EmailSettings__Port=587" >> .env
           echo "EmailSettings__GmailUser=${{ secrets.GMAIL_USER }}" >> .env
           echo "EmailSettings__GmailAppPassword=${{ secrets.GMAIL_TOKEN }}" >> .env
+          echo "FrontEndSettings__Url=${{ secrets.FRONTEND_URL }}" >> .env
           
           docker compose pull
           docker compose up -d --remove-orphans
