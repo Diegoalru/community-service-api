@@ -2,6 +2,7 @@ using community_service_api.DbContext;
 using community_service_api.HostedServices;
 using community_service_api.Middleware;
 using community_service_api.Models;
+using community_service_api.Models.DBTableEntities;
 using community_service_api.Repositories;
 using community_service_api.Services;
 using Dapper;
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<NewApplicationDbContext>(options =>
     options.UseOracle(connectionString));
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<FrontEndSettings>(builder.Configuration.GetSection("FrontEndSettings"));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
@@ -40,7 +42,11 @@ builder.Services.AddScoped<IHorarioActividadService, HorarioActividadService>();
 builder.Services.AddScoped<IParticipanteActividadService, ParticipanteActividadService>();
 builder.Services.AddScoped<ICertificacionParticipacionService, CertificacionParticipacionService>();
 builder.Services.AddScoped<IUniversidadService, UniversidadService>();
+builder.Services.AddScoped<IIntegracionService, IntegracionService>();
 builder.Services.AddScoped<IProcedureRepository, ProcedureRepository>();
+builder.Services.AddScoped<IMailerService, MailerService>();
+builder.Services.AddScoped<IEmailQueueService, EmailQueueService>();
+builder.Services.AddScoped<IRepository<CorreoPendiente>, GenericRepository<CorreoPendiente>>();
 builder.Services.AddHostedService<CertificationGenService>();
 builder.Services.AddHostedService<EmailSendService>();
 

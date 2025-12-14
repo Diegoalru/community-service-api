@@ -6,7 +6,7 @@ namespace community_service_api.Models.Dtos;
 /// </summary>
 public class CertificateEmailDataDto
 {
-    public byte[] IdCertificacion { get; set; }
+    public required byte[] IdCertificacion { get; set; }
     public string NombreVoluntario { get; set; } = null!;
     public string EmailVoluntario { get; set; } = null!;
     public byte[]? Documento { get; set; }

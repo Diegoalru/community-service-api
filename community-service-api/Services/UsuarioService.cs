@@ -18,10 +18,9 @@ public interface IUsuarioService
     Task<UsuarioDto> CreateAsync(UsuarioCreateDto dto);
     Task<bool> UpdateAsync(int id, UsuarioUpdateDto dto);
     Task<bool> DeleteAsync(int id);
-    Task<int> CreateUsuarioWithProcedureAsync(UsuarioCreateDtoTest dto);
 }
 
-public class UsuarioService(IRepository<Usuario> repository, IProcedureRepository procedureRepository)
+public class UsuarioService(IRepository<Usuario> repository)
     : IUsuarioService
 {
     public async Task<IEnumerable<UsuarioDto>> GetAllAsync()
@@ -59,31 +58,5 @@ public class UsuarioService(IRepository<Usuario> repository, IProcedureRepositor
     public async Task<bool> DeleteAsync(int id)
     {
         return await repository.DeleteAsync(id);
-    }
-    
-    public async Task<int> CreateUsuarioWithProcedureAsync(UsuarioCreateDtoTest dto)
-    {
-        await procedureRepository.BeginTransactionAsync();
-
-        try
-        {
-            var dyParam = new OracleDynamicParameters();
-            dyParam.Add("PV_USERNAME", dto.Username, OracleMappingType.Varchar2, ParameterDirection.Input);
-            dyParam.Add("PV_PASSWORD", dto.Password, OracleMappingType.Varchar2, ParameterDirection.Input);
-            dyParam.Add("PV_ID_USUARIO", dbType: OracleMappingType.Int32, direction: ParameterDirection.Output);
-
-            var newUserId = await procedureRepository.ExecuteAsync<int>(
-                "PKG_USUARIO.P_INSERTA_USUARIO",
-                dyParam,
-                "PV_ID_USUARIO");
-
-            await procedureRepository.CommitTransactionAsync();
-            return newUserId;
-        }
-        catch
-        {
-            await procedureRepository.RollbackTransactionAsync();
-            throw;
-        }
     }
 }

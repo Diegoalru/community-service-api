@@ -36,16 +36,6 @@ public class UsuariosController(IUsuarioService usuarioService) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.IdUsuario }, created);
     }
 
-    [HttpPost("CreateUser")]
-    public async Task<IActionResult> CreateWithProcedure([FromBody] UsuarioCreateDtoTest dto)
-    {
-        var newUserId = await usuarioService.CreateUsuarioWithProcedureAsync(dto);
-        
-        var newUser = await usuarioService.GetByIdAsync(newUserId);
-
-        return CreatedAtAction(nameof(GetById), new { id = newUserId }, newUser);
-    }
-
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UsuarioUpdateDto dto)
     {

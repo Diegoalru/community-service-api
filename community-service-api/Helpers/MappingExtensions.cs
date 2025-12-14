@@ -455,10 +455,6 @@ public static class MappingExtensions
         FechaUltimaAsistencia = entity.FechaUltimaAsistencia,
         Situacion = entity.Situacion,
         Observaciones = entity.Observaciones,
-        FechaEnvio = entity.FechaEnvio,
-        IntentosEnvio = entity.IntentosEnvio,
-        UltimoIntentoEnvio = entity.UltimoIntentoEnvio,
-        UltimoErrorEnvio = entity.UltimoErrorEnvio,
         Estado = entity.Estado
     };
 
@@ -475,10 +471,6 @@ public static class MappingExtensions
         FechaUltimaAsistencia = dto.FechaUltimaAsistencia,
         Situacion = dto.Situacion,
         Observaciones = dto.Observaciones,
-        FechaEnvio = dto.FechaEnvio,
-        IntentosEnvio = dto.IntentosEnvio,
-        UltimoIntentoEnvio = dto.UltimoIntentoEnvio,
-        UltimoErrorEnvio = dto.UltimoErrorEnvio,
         FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
         FechaHasta = dto.FechaHasta,
         Estado = dto.Estado,
@@ -497,10 +489,6 @@ public static class MappingExtensions
         entity.FechaUltimaAsistencia = dto.FechaUltimaAsistencia;
         entity.Situacion = dto.Situacion;
         entity.Observaciones = dto.Observaciones;
-        entity.FechaEnvio = dto.FechaEnvio;
-        entity.IntentosEnvio = dto.IntentosEnvio;
-        entity.UltimoIntentoEnvio = dto.UltimoIntentoEnvio;
-        entity.UltimoErrorEnvio = dto.UltimoErrorEnvio;
         entity.FechaDesde = dto.FechaDesde ?? entity.FechaDesde;
         entity.FechaHasta = dto.FechaHasta;
         entity.Estado = dto.Estado;
