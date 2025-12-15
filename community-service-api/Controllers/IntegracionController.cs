@@ -1,5 +1,6 @@
 using community_service_api.Models.Dtos;
 using community_service_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace community_service_api.Controllers;
@@ -13,6 +14,7 @@ public class IntegracionController(IIntegracionService integracionService) : Con
 
     private const string UsuarioInicioSesionExitosamenteMensaje = "Inicio de sesión exitoso.";
 
+    [AllowAnonymous]
     [HttpPost("RegistroUsuario")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -48,6 +50,7 @@ public class IntegracionController(IIntegracionService integracionService) : Con
         };
     }
 
+    [AllowAnonymous]
     [HttpPost("IniciarSesion")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -83,6 +86,7 @@ public class IntegracionController(IIntegracionService integracionService) : Con
         };
     }
 
+    [AllowAnonymous]
     [HttpGet("ActivarCuenta")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -117,6 +121,7 @@ public class IntegracionController(IIntegracionService integracionService) : Con
         };
     }
 
+    [AllowAnonymous]
     [HttpPost("SolicitarRecuperacionPassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -156,6 +161,7 @@ public class IntegracionController(IIntegracionService integracionService) : Con
         });
     }
 
+    [AllowAnonymous]
     [HttpPost("RestablecerPassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -186,18 +192,27 @@ public class IntegracionController(IIntegracionService integracionService) : Con
         return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
     }
 
+    [Authorize]
     [HttpPost("CambiarPassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CambiarPassword([FromBody] ChangePasswordDto dto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        // En una aplicación real, el nombre de usuario se obtendría de los claims del usuario autenticado.
-        // Por ejemplo: var username = User.Identity.Name;
-        // Y se compararía con dto.Username para asegurar que un usuario solo puede cambiar su propia contraseña.
+        // Validar que el usuario autenticado coincida con el del DTO
+        var usernameClaim = User.FindFirst("username")?.Value ?? User.Identity?.Name;
+        if (string.IsNullOrEmpty(usernameClaim))
+            return Unauthorized(new { mensaje = "No se pudo determinar el usuario autenticado." });
+
+        if (!string.Equals(usernameClaim, dto.Username, StringComparison.OrdinalIgnoreCase))
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new { mensaje = "No tiene permiso para cambiar la contraseña de otro usuario." });
+
         Respuesta respuesta;
 
         try
@@ -219,6 +234,7 @@ public class IntegracionController(IIntegracionService integracionService) : Con
         return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
     }
 
+    [AllowAnonymous]
     [HttpPost("ReenviarActivacion")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

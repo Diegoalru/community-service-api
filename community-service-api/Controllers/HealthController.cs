@@ -1,4 +1,5 @@
 ﻿using community_service_api.DbContext;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace community_service_api.Controllers;
@@ -7,6 +8,7 @@ namespace community_service_api.Controllers;
 [Route("api/[controller]")]
 public class HealthController(NewApplicationDbContext context) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpGet("CheckDatabaseConnection")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

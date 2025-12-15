@@ -73,6 +73,9 @@ jobs:
           echo "JwtSettings__Audience=${{ secrets.JWT_AUDIENCE }}" >> .env
           echo "JwtSettings__ExpirationMinutes=${{ secrets.JWT_EXP_MINUTES }}" >> .env
           
+          # Global auth enable/disable flag
+          echo "AuthSettings__Enabled=${{ secrets.AUTH_ENABLED }}" >> .env
+          
           docker compose pull
           docker compose up -d --remove-orphans
           docker image prune -f

@@ -8,8 +8,10 @@ using community_service_api.Repositories;
 using community_service_api.Services;
 using Dapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Oracle.ManagedDataAccess.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,6 +67,25 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// Authorization (global) with a configurable enable flag
+var authEnabled = builder.Configuration.GetSection("AuthSettings").GetValue("Enabled", true);
+
+if (authEnabled)
+{
+    builder.Services.AddAuthorization(options =>
+    {
+        // Require authenticated user by default across the app
+        options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+    });
+}
+else
+{
+    // Authorization disabled: still add authorization services to avoid runtime issues
+    builder.Services.AddAuthorization();
+}
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ITipoIdentificadorService, TipoIdentificadorService>();
@@ -91,7 +112,33 @@ builder.Services.AddHostedService<EmailSendService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Community Service API", Version = "v1" });
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Ingrese el token JWT en formato: Bearer {token}",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+
+    c.AddSecurityDefinition("Bearer", securityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            securityScheme,
+            new List<string>()
+        }
+    });
+});
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -109,13 +156,9 @@ var app = builder.Build();
 // Register the custom exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Optional: leer el entorno si lo necesitas para lógica específica
-var env = app.Environment;
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
