@@ -56,4 +56,22 @@ public class UbicacionesController(NewApplicationDbContext db) : ControllerBase
             .ToList();
         return Ok(items);
     }
+
+    [AllowAnonymous]
+    [HttpGet("CodigoPostal")]
+    public IActionResult GetCodigoCompleto([FromQuery] int idDistrito)
+    {
+        if (idDistrito <= 0) return BadRequest(new { mensaje = "idDistrito debe ser válido." });
+
+        var codigo = (from p in db.Provincia
+                join c in db.Canton on p.IdProvincia equals c.IdProvincia
+                join d in db.Distrito on c.IdCanton equals d.IdCanton
+                where d.IdDistrito == idDistrito
+                select (p.Codigo) + (c.Codigo) + (d.Codigo))
+            .FirstOrDefault();
+
+        if (codigo == null) return NotFound(new { mensaje = "Distrito no encontrado." });
+
+        return Ok(new { codigo });
+    }
 }
