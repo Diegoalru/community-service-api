@@ -4,41 +4,49 @@ namespace community_service_api.Models.Dtos;
 
 public class ActivationDto
 {
-    [Required]
+    [Required(ErrorMessage = "El token es requerido.")]
+    [StringLength(500, ErrorMessage = "El token no puede exceder 500 caracteres.")]
     public required string Token { get; set; }
 }
 
 public class RequestPasswordRecoveryDto
 {
-    [Required]
+    [Required(ErrorMessage = "El nombre de usuario es requerido.")]
+    [StringLength(50, ErrorMessage = "El nombre de usuario no puede exceder 50 caracteres.")]
     public required string Username { get; set; }
 }
 
 public class ResetPasswordDto
 {
-    [Required]
+    [Required(ErrorMessage = "El token es requerido.")]
+    [StringLength(500, ErrorMessage = "El token no puede exceder 500 caracteres.")]
     public required string Token { get; set; }
 
-    [Required]
-    [MinLength(6)]
+    [Required(ErrorMessage = "La nueva contraseña es requerida.")]
+    [MinLength(6, ErrorMessage = "La contraseña debe tener al menos 6 caracteres.")]
+    [MaxLength(50, ErrorMessage = "La contraseña no puede exceder 50 caracteres.")]
     public required string NuevaPassword { get; set; }
 }
 
 public class ChangePasswordDto
 {
-    [Required]
+    [Required(ErrorMessage = "El nombre de usuario es requerido.")]
+    [StringLength(50, ErrorMessage = "El nombre de usuario no puede exceder 50 caracteres.")]
     public required string Username { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "La contraseña actual es requerida.")]
+    [StringLength(50, ErrorMessage = "La contraseña no puede exceder 50 caracteres.")]
     public required string Password { get; set; }
 
-    [Required]
-    [MinLength(6)]
+    [Required(ErrorMessage = "La nueva contraseña es requerida.")]
+    [MinLength(6, ErrorMessage = "La contraseña debe tener al menos 6 caracteres.")]
+    [MaxLength(50, ErrorMessage = "La contraseña no puede exceder 50 caracteres.")]
     public required string NuevaPassword { get; set; }
 }
 
 public class ResendActivationDto
 {
-    [Required]
+    [Required(ErrorMessage = "El nombre de usuario es requerido.")]
+    [StringLength(50, ErrorMessage = "El nombre de usuario no puede exceder 50 caracteres.")]
     public required string Username { get; set; }
 }

@@ -74,7 +74,8 @@ public class IntegracionController(IIntegracionService integracionService) : Con
             1 => Ok(new
             {
                 mensaje = UsuarioInicioSesionExitosamenteMensaje,
-                idUsuario = respuesta.IdUsuario
+                idUsuario = respuesta.IdUsuario,
+                token = respuesta.Token
             }),
             -1 => StatusCode(StatusCodes.Status500InternalServerError,
                 new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo }),

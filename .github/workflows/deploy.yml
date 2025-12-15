@@ -57,7 +57,7 @@ jobs:
 
       - name: Update Container Production
         run: |
-          cd /home/ubuntu/app
+          cd ~/app
           
           echo "ASPNETCORE_ENVIRONMENT=Production" > .env
           echo "ConnectionStrings__OracleConnection=${{ secrets.ORACLE_CONN_STRING }}" >> .env
@@ -66,6 +66,12 @@ jobs:
           echo "EmailSettings__GmailUser=${{ secrets.GMAIL_USER }}" >> .env
           echo "EmailSettings__GmailAppPassword=${{ secrets.GMAIL_TOKEN }}" >> .env
           echo "FrontEndSettings__Url=${{ secrets.FRONTEND_URL }}" >> .env
+          
+          # JWT Settings via environment variables (secrets)
+          echo "JwtSettings__SecretKey=${{ secrets.JWT_SECRET }}" >> .env
+          echo "JwtSettings__Issuer=${{ secrets.JWT_ISSUER }}" >> .env
+          echo "JwtSettings__Audience=${{ secrets.JWT_AUDIENCE }}" >> .env
+          echo "JwtSettings__ExpirationMinutes=${{ secrets.JWT_EXP_MINUTES }}" >> .env
           
           docker compose pull
           docker compose up -d --remove-orphans

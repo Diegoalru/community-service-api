@@ -711,32 +711,17 @@ CREATE TABLE CORREO_PENDIENTE
     CONSTRAINT FK_CORREO_CERTIFICADO FOREIGN KEY (ID_CERTIFICACION) REFERENCES CERTIFICADO_PARTICIPACION (ID_CERTIFICACION)
 );
 
-
-
 COMMENT ON TABLE CORREO_PENDIENTE IS 'Tabla para encolar correos electrónicos a ser enviados por un proceso en segundo plano.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.ID_CORREO_PENDIENTE IS 'Identificador único del correo pendiente.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.DESTINATARIO IS 'Dirección de correo electrónico del destinatario.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.ASUNTO IS 'Asunto del correo electrónico.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.CUERPO IS 'Cuerpo del correo electrónico, puede contener HTML.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.ADJUNTO IS 'Contenido binario del archivo adjunto (e.g., PDF del certificado).';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.NOMBRE_ADJUNTO IS 'Nombre del archivo adjunto.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.ID_USUARIO IS 'ID del usuario al que se le envía este correo.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.ID_CERTIFICACION IS 'ID del certificado que originó este correo, si aplica.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.ESTADO IS 'Estado del envío del correo: Pendiente, Enviado, Fallido.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.INTENTOS IS 'Número de intentos de envío.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.FECHA_CREACION IS 'Fecha en que se encoló el correo.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.FECHA_ULTIMO_INTENTO IS 'Fecha del último intento de envío.';
-
 COMMENT ON COLUMN CORREO_PENDIENTE.MENSAJE_ERROR IS 'Mensaje de error si el último intento de envío falló.';
