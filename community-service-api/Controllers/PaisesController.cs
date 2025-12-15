@@ -1,7 +1,7 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using community_service_api.Models.Dtos;
 using community_service_api.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace community_service_api.Controllers;
 
@@ -16,6 +16,7 @@ public class PaisesController : ControllerBase
         _service = service;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -23,6 +24,7 @@ public class PaisesController : ControllerBase
         return Ok(paises);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
