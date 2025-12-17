@@ -1,4 +1,3 @@
-using System;
 using community_service_api.Models.DBTableEntities;
 using community_service_api.Models.Dtos;
 
@@ -7,32 +6,38 @@ namespace community_service_api.Helpers;
 public static class MappingExtensions
 {
     // Usuario mappings
-    public static UsuarioDto ToDto(this Usuario entity) => new()
+    public static UsuarioDto ToDto(this Usuario entity)
     {
-        IdUsuario = entity.IdUsuario,
-        Username = entity.Username,
-        Restablecer = entity.Restablecer[0],
-        IntentosFallidos = entity.IntentosFallidos,
-        FechaDesbloqueo = entity.FechaDesbloqueo,
-        TokenEstado = entity.TokenEstado[0],
-        TokenExpiracion = entity.TokenExpiracion,
-        Estado = entity.Estado[0]
-    };
+        return new UsuarioDto
+        {
+            IdUsuario = entity.IdUsuario,
+            Username = entity.Username,
+            Restablecer = entity.Restablecer[0],
+            IntentosFallidos = entity.IntentosFallidos,
+            FechaDesbloqueo = entity.FechaDesbloqueo,
+            TokenEstado = entity.TokenEstado[0],
+            TokenExpiracion = entity.TokenExpiracion,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static Usuario ToEntity(this UsuarioCreateDto dto) => new()
+    public static Usuario ToEntity(this UsuarioCreateDto dto)
     {
-        Username = dto.Username,
-        Password = dto.Password,
-        Restablecer = char.ToString(dto.Restablecer),
-        IntentosFallidos = dto.IntentosFallidos,
-        FechaDesbloqueo = dto.FechaDesbloqueo,
-        Token = dto.Token,
-        TokenEstado = char.ToString(dto.TokenEstado),
-        TokenExpiracion = dto.TokenExpiracion,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new Usuario
+        {
+            Username = dto.Username,
+            Password = dto.Password,
+            Restablecer = char.ToString(dto.Restablecer),
+            IntentosFallidos = dto.IntentosFallidos,
+            FechaDesbloqueo = dto.FechaDesbloqueo,
+            Token = dto.Token,
+            TokenEstado = char.ToString(dto.TokenEstado),
+            TokenExpiracion = dto.TokenExpiracion,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this Usuario entity, UsuarioUpdateDto dto)
     {
@@ -50,20 +55,26 @@ public static class MappingExtensions
     }
 
     // TipoIdentificador mappings
-    public static TipoIdentificadorDto ToDto(this TipoIdentificador entity) => new()
+    public static TipoIdentificadorDto ToDto(this TipoIdentificador entity)
     {
-        IdIdentificador = entity.IdIdentificador,
-        Descripcion = entity.Descripcion,
-        Estado = entity.Estado[0],
-    };
+        return new TipoIdentificadorDto
+        {
+            IdIdentificador = entity.IdIdentificador,
+            Descripcion = entity.Descripcion,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static TipoIdentificador ToEntity(this TipoIdentificadorCreateDto dto) => new()
+    public static TipoIdentificador ToEntity(this TipoIdentificadorCreateDto dto)
     {
-        Descripcion = dto.Descripcion,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado),
-    };
+        return new TipoIdentificador
+        {
+            Descripcion = dto.Descripcion,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this TipoIdentificador entity, TipoIdentificadorUpdateDto dto)
     {
@@ -74,20 +85,26 @@ public static class MappingExtensions
     }
 
     // Pais mappings
-    public static PaisDto ToDto(this Pais entity) => new()
+    public static PaisDto ToDto(this Pais entity)
     {
-        IdPais = entity.IdPais,
-        Nombre = entity.Nombre,
-        Estado = entity.Estado[0]
-    };
+        return new PaisDto
+        {
+            IdPais = entity.IdPais,
+            Nombre = entity.Nombre,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static Pais ToEntity(this PaisCreateDto dto) => new()
+    public static Pais ToEntity(this PaisCreateDto dto)
     {
-        Nombre = dto.Nombre,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new Pais
+        {
+            Nombre = dto.Nombre,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this Pais entity, PaisUpdateDto dto)
     {
@@ -98,22 +115,28 @@ public static class MappingExtensions
     }
 
     // Universidad mappings
-    public static UniversidadDto ToDto(this Universidad entity) => new()
+    public static UniversidadDto ToDto(this Universidad entity)
     {
-        IdUniversidad = entity.IdUniversidad,
-        Nombre = entity.Nombre,
-        Siglas = entity.Siglas,
-        Estado = entity.Estado[0]
-    };
+        return new UniversidadDto
+        {
+            IdUniversidad = entity.IdUniversidad,
+            Nombre = entity.Nombre,
+            Siglas = entity.Siglas,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static Universidad ToEntity(this UniversidadCreateDto dto) => new()
+    public static Universidad ToEntity(this UniversidadCreateDto dto)
     {
-        Nombre = dto.Nombre,
-        Siglas = dto.Siglas,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new Universidad
+        {
+            Nombre = dto.Nombre,
+            Siglas = dto.Siglas,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this Universidad entity, UniversidadUpdateDto dto)
     {
@@ -125,36 +148,42 @@ public static class MappingExtensions
     }
 
     // Perfil mappings
-    public static PerfilDto ToDto(this Perfil entity) => new()
+    public static PerfilDto ToDto(this Perfil entity)
     {
-        IdPerfil = entity.IdPerfil,
-        Identificacion = entity.Identificacion,
-        Nombre = entity.Nombre,
-        ApellidoP = entity.ApellidoP,
-        ApellidoM = entity.ApellidoM,
-        FechaNacimiento = entity.FechaNacimiento,
-        Carrera = entity.Carrera,
-        Bibliografia = entity.Bibliografia,
-        Estado = entity.Estado[0]
-    };
+        return new PerfilDto
+        {
+            IdPerfil = entity.IdPerfil,
+            Identificacion = entity.Identificacion,
+            Nombre = entity.Nombre,
+            ApellidoP = entity.ApellidoP,
+            ApellidoM = entity.ApellidoM,
+            FechaNacimiento = entity.FechaNacimiento,
+            Carrera = entity.Carrera,
+            Bibliografia = entity.Bibliografia,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static Perfil ToEntity(this PerfilCreateDto dto) => new()
+    public static Perfil ToEntity(this PerfilCreateDto dto)
     {
-        IdUsuario = dto.IdUsuario,
-        IdUbicacion = dto.IdUbicacion,
-        IdIdentificador = dto.IdIdentificador,
-        IdUniversidad = dto.IdUniversidad,
-        Identificacion = dto.Identificacion,
-        Nombre = dto.Nombre,
-        ApellidoP = dto.ApellidoP,
-        ApellidoM = dto.ApellidoM,
-        FechaNacimiento = dto.FechaNacimiento,
-        Carrera = dto.Carrera,
-        Bibliografia = dto.Bibliografia,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new Perfil
+        {
+            IdUsuario = dto.IdUsuario,
+            IdUbicacion = dto.IdUbicacion,
+            IdIdentificador = dto.IdIdentificador,
+            IdUniversidad = dto.IdUniversidad,
+            Identificacion = dto.Identificacion,
+            Nombre = dto.Nombre,
+            ApellidoP = dto.ApellidoP,
+            ApellidoM = dto.ApellidoM,
+            FechaNacimiento = dto.FechaNacimiento,
+            Carrera = dto.Carrera,
+            Bibliografia = dto.Bibliografia,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this Perfil entity, PerfilUpdateDto dto)
     {
@@ -175,25 +204,31 @@ public static class MappingExtensions
     }
 
     // Organizacion mappings
-    public static OrganizacionDto ToDto(this Organizacion entity) => new()
+    public static OrganizacionDto ToDto(this Organizacion entity)
     {
-        IdOrganizacion = entity.IdOrganizacion,
-        Nombre = entity.Nombre,
-        Descripcion = entity.Descripcion,
-        Estado = entity.Estado[0]
-    };
+        return new OrganizacionDto
+        {
+            IdOrganizacion = entity.IdOrganizacion,
+            Nombre = entity.Nombre,
+            Descripcion = entity.Descripcion,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static Organizacion ToEntity(this OrganizacionCreateDto dto) => new()
+    public static Organizacion ToEntity(this OrganizacionCreateDto dto)
     {
-        IdUsuarioCreador = dto.IdUsuarioCreador,
-        IdUbicacion = dto.IdUbicacion,
-        IdUniversidad = dto.IdUniversidad,
-        Nombre = dto.Nombre,
-        Descripcion = dto.Descripcion,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new Organizacion
+        {
+            IdUsuarioCreador = dto.IdUsuarioCreador,
+            IdUbicacion = dto.IdUbicacion,
+            IdUniversidad = dto.IdUniversidad,
+            Nombre = dto.Nombre,
+            Descripcion = dto.Descripcion,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this Organizacion entity, OrganizacionUpdateDto dto)
     {
@@ -208,20 +243,26 @@ public static class MappingExtensions
     }
 
     // Rol mappings
-    public static RolDto ToDto(this Rol entity) => new()
+    public static RolDto ToDto(this Rol entity)
     {
-        IdRol = entity.IdRol,
-        Nombre = entity.Nombre,
-        Estado = entity.Estado[0]
-    };
+        return new RolDto
+        {
+            IdRol = entity.IdRol,
+            Nombre = entity.Nombre,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static Rol ToEntity(this RolCreateDto dto) => new()
+    public static Rol ToEntity(this RolCreateDto dto)
     {
-        Nombre = dto.Nombre,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new Rol
+        {
+            Nombre = dto.Nombre,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this Rol entity, RolUpdateDto dto)
     {
@@ -232,24 +273,30 @@ public static class MappingExtensions
     }
 
     // RolUsuarioOrganizacion mappings
-    public static RolUsuarioOrganizacionDto ToDto(this RolUsuarioOrganizacion entity) => new()
+    public static RolUsuarioOrganizacionDto ToDto(this RolUsuarioOrganizacion entity)
     {
-        IdRolUsuarioOrganizacion = entity.IdRolUsuarioOrganizacion,
-        EsActivo = entity.EsActivo[0],
-        Estado = entity.Estado[0]
-    };
+        return new RolUsuarioOrganizacionDto
+        {
+            IdRolUsuarioOrganizacion = entity.IdRolUsuarioOrganizacion,
+            EsActivo = entity.EsActivo[0],
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static RolUsuarioOrganizacion ToEntity(this RolUsuarioOrganizacionCreateDto dto) => new()
+    public static RolUsuarioOrganizacion ToEntity(this RolUsuarioOrganizacionCreateDto dto)
     {
-        IdOrganizacion = dto.IdOrganizacion,
-        IdUsuarioAsignado = dto.IdUsuarioAsignado,
-        IdUsuarioAdministrador = dto.IdUsuarioAdministrador,
-        IdRol = dto.IdRol,
-        EsActivo = char.ToString(dto.EsActivo),
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new RolUsuarioOrganizacion
+        {
+            IdOrganizacion = dto.IdOrganizacion,
+            IdUsuarioAsignado = dto.IdUsuarioAsignado,
+            IdUsuarioAdministrador = dto.IdUsuarioAdministrador,
+            IdRol = dto.IdRol,
+            EsActivo = char.ToString(dto.EsActivo),
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this RolUsuarioOrganizacion entity, RolUsuarioOrganizacionUpdateDto dto)
     {
@@ -264,20 +311,26 @@ public static class MappingExtensions
     }
 
     // CategoriaActividad mappings
-    public static CategoriaActividadDto ToDto(this CategoriaActividad entity) => new()
+    public static CategoriaActividadDto ToDto(this CategoriaActividad entity)
     {
-        IdCategoriaActividad = entity.IdCategoriaActividad,
-        Nombre = entity.Nombre,
-        Estado = entity.Estado[0]
-    };
+        return new CategoriaActividadDto
+        {
+            IdCategoriaActividad = entity.IdCategoriaActividad,
+            Nombre = entity.Nombre,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static CategoriaActividad ToEntity(this CategoriaActividadCreateDto dto) => new()
+    public static CategoriaActividad ToEntity(this CategoriaActividadCreateDto dto)
     {
-        Nombre = dto.Nombre,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new CategoriaActividad
+        {
+            Nombre = dto.Nombre,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this CategoriaActividad entity, CategoriaActividadUpdateDto dto)
     {
@@ -288,36 +341,42 @@ public static class MappingExtensions
     }
 
     // Actividad mappings
-    public static ActividadDto ToDto(this Actividad entity) => new()
+    public static ActividadDto ToDto(this Actividad entity)
     {
-        IdActividad = entity.IdActividad,
-        Nombre = entity.Nombre,
-        Descripcion = entity.Descripcion,
-        FechaInicio = entity.FechaInicio,
-        FechaFin = entity.FechaFin,
-        Horas = entity.Horas,
-        Cupos = entity.Cupos,
-        Situacion = entity.Situacion[0],
-        Estado = entity.Estado[0]
-    };
+        return new ActividadDto
+        {
+            IdActividad = entity.IdActividad,
+            Nombre = entity.Nombre,
+            Descripcion = entity.Descripcion,
+            FechaInicio = entity.FechaInicio,
+            FechaFin = entity.FechaFin,
+            Horas = entity.Horas,
+            Cupos = entity.Cupos,
+            Situacion = entity.Situacion[0],
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static Actividad ToEntity(this ActividadCreateDto dto) => new()
+    public static Actividad ToEntity(this ActividadCreateDto dto)
     {
-        IdOrganizacion = dto.IdOrganizacion,
-        IdUsuarioCreador = dto.IdUsuarioCreador,
-        IdCategoria = dto.IdCategoria,
-        IdUbicacion = dto.IdUbicacion,
-        Nombre = dto.Nombre,
-        Descripcion = dto.Descripcion,
-        FechaInicio = dto.FechaInicio,
-        FechaFin = dto.FechaFin,
-        Horas = dto.Horas,
-        Cupos = dto.Cupos,
-        Situacion = char.ToString(dto.Situacion),
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new Actividad
+        {
+            IdOrganizacion = dto.IdOrganizacion,
+            IdUsuarioCreador = dto.IdUsuarioCreador,
+            IdCategoria = dto.IdCategoria,
+            IdUbicacion = dto.IdUbicacion,
+            Nombre = dto.Nombre,
+            Descripcion = dto.Descripcion,
+            FechaInicio = dto.FechaInicio,
+            FechaFin = dto.FechaFin,
+            Horas = dto.Horas,
+            Cupos = dto.Cupos,
+            Situacion = char.ToString(dto.Situacion),
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this Actividad entity, ActividadUpdateDto dto)
     {
@@ -338,21 +397,27 @@ public static class MappingExtensions
     }
 
     // CoordinadorActividad mappings
-    public static CoordinadorActividadDto ToDto(this CoordinadorActividad entity) => new()
+    public static CoordinadorActividadDto ToDto(this CoordinadorActividad entity)
     {
-        IdCoordinadorActividad = entity.IdCoordinadorActividad,
-        Estado = entity.Estado[0]
-    };
+        return new CoordinadorActividadDto
+        {
+            IdCoordinadorActividad = entity.IdCoordinadorActividad,
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static CoordinadorActividad ToEntity(this CoordinadorActividadCreateDto dto) => new()
+    public static CoordinadorActividad ToEntity(this CoordinadorActividadCreateDto dto)
     {
-        IdOrganizacion = dto.IdOrganizacion,
-        IdActividad = dto.IdActividad,
-        IdUsuarioCoordinador = dto.IdUsuarioCoordinador,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new CoordinadorActividad
+        {
+            IdOrganizacion = dto.IdOrganizacion,
+            IdActividad = dto.IdActividad,
+            IdUsuarioCoordinador = dto.IdUsuarioCoordinador,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this CoordinadorActividad entity, CoordinadorActividadUpdateDto dto)
     {
@@ -365,31 +430,37 @@ public static class MappingExtensions
     }
 
     // HorarioActividad mappings
-    public static HorarioActividadDto ToDto(this HorarioActividad entity) => new()
+    public static HorarioActividadDto ToDto(this HorarioActividad entity)
     {
-        IdHorarioActividad = entity.IdHorarioActividad,
-        Fecha = entity.Fecha,
-        HoraInicio = entity.HoraInicio,
-        HoraFin = entity.HoraFin,
-        Descripcion = entity.Descripcion,
-        Situacion = entity.Situacion[0],
-        Estado = entity.Estado[0]
-    };
+        return new HorarioActividadDto
+        {
+            IdHorarioActividad = entity.IdHorarioActividad,
+            Fecha = entity.Fecha,
+            HoraInicio = entity.HoraInicio,
+            HoraFin = entity.HoraFin,
+            Descripcion = entity.Descripcion,
+            Situacion = entity.Situacion[0],
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static HorarioActividad ToEntity(this HorarioActividadCreateDto dto) => new()
+    public static HorarioActividad ToEntity(this HorarioActividadCreateDto dto)
     {
-        IdOrganizacion = dto.IdOrganizacion,
-        IdActividad = dto.IdActividad,
-        IdUsuario = dto.IdUsuario,
-        Fecha = dto.Fecha,
-        HoraInicio = dto.HoraInicio,
-        HoraFin = dto.HoraFin,
-        Descripcion = dto.Descripcion,
-        Situacion = char.ToString(dto.Situacion),
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new HorarioActividad
+        {
+            IdOrganizacion = dto.IdOrganizacion,
+            IdActividad = dto.IdActividad,
+            IdUsuario = dto.IdUsuario,
+            Fecha = dto.Fecha,
+            HoraInicio = dto.HoraInicio,
+            HoraFin = dto.HoraFin,
+            Descripcion = dto.Descripcion,
+            Situacion = char.ToString(dto.Situacion),
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this HorarioActividad entity, HorarioActividadUpdateDto dto)
     {
@@ -407,28 +478,34 @@ public static class MappingExtensions
     }
 
     // ParticipanteActividad mappings
-    public static ParticipanteActividadDto ToDto(this ParticipanteActividad entity) => new()
+    public static ParticipanteActividadDto ToDto(this ParticipanteActividad entity)
     {
-        IdParticipanteActividad = entity.IdParticipanteActividad,
-        FechaInscripcion = entity.FechaInscripcion,
-        FechaRetiro = entity.FechaRetiro,
-        Situacion = entity.Situacion[0],
-        Estado = entity.Estado[0]
-    };
+        return new ParticipanteActividadDto
+        {
+            IdParticipanteActividad = entity.IdParticipanteActividad,
+            FechaInscripcion = entity.FechaInscripcion,
+            FechaRetiro = entity.FechaRetiro,
+            Situacion = entity.Situacion[0],
+            Estado = entity.Estado[0]
+        };
+    }
 
-    public static ParticipanteActividad ToEntity(this ParticipanteActividadCreateDto dto) => new()
+    public static ParticipanteActividad ToEntity(this ParticipanteActividadCreateDto dto)
     {
-        IdOrganizacion = dto.IdOrganizacion,
-        IdActividad = dto.IdActividad,
-        IdHorarioActividad = dto.IdHorarioActividad,
-        IdUsuarioVoluntario = dto.IdUsuarioVoluntario,
-        FechaInscripcion = dto.FechaInscripcion,
-        FechaRetiro = dto.FechaRetiro,
-        Situacion = char.ToString(dto.Situacion),
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = char.ToString(dto.Estado)
-    };
+        return new ParticipanteActividad
+        {
+            IdOrganizacion = dto.IdOrganizacion,
+            IdActividad = dto.IdActividad,
+            IdHorarioActividad = dto.IdHorarioActividad,
+            IdUsuarioVoluntario = dto.IdUsuarioVoluntario,
+            FechaInscripcion = dto.FechaInscripcion,
+            FechaRetiro = dto.FechaRetiro,
+            Situacion = char.ToString(dto.Situacion),
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = char.ToString(dto.Estado)
+        };
+    }
 
     public static void UpdateFromDto(this ParticipanteActividad entity, ParticipanteActividadUpdateDto dto)
     {
@@ -445,36 +522,42 @@ public static class MappingExtensions
     }
 
     // CertificadoParticipacion mappings
-    public static CertificacionParticipacionDto ToDto(this CertificadoParticipacion entity) => new()
+    public static CertificacionParticipacionDto ToDto(this CertificadoParticipacion entity)
     {
-        IdCertificacion = entity.IdCertificacion,
-        FechaEmision = entity.FechaEmision,
-        HorasTotales = entity.HorasTotales,
-        DiasTotales = entity.DiasTotales,
-        FechaPrimeraAsistencia = entity.FechaPrimeraAsistencia,
-        FechaUltimaAsistencia = entity.FechaUltimaAsistencia,
-        Situacion = entity.Situacion,
-        Observaciones = entity.Observaciones,
-        Estado = entity.Estado
-    };
+        return new CertificacionParticipacionDto
+        {
+            IdCertificacion = entity.IdCertificacion,
+            FechaEmision = entity.FechaEmision,
+            HorasTotales = entity.HorasTotales,
+            DiasTotales = entity.DiasTotales,
+            FechaPrimeraAsistencia = entity.FechaPrimeraAsistencia,
+            FechaUltimaAsistencia = entity.FechaUltimaAsistencia,
+            Situacion = entity.Situacion,
+            Observaciones = entity.Observaciones,
+            Estado = entity.Estado
+        };
+    }
 
-    public static CertificadoParticipacion ToEntity(this CertificacionParticipacionCreateDto dto) => new()
+    public static CertificadoParticipacion ToEntity(this CertificacionParticipacionCreateDto dto)
     {
-        IdParticipanteActividad = dto.IdParticipanteActividad,
-        IdActividad = dto.IdActividad,
-        IdOrganizacion = dto.IdOrganizacion,
-        IdUsuarioVoluntario = dto.IdUsuarioVoluntario,
-        FechaEmision = dto.FechaEmision,
-        HorasTotales = dto.HorasTotales,
-        DiasTotales = dto.DiasTotales,
-        FechaPrimeraAsistencia = dto.FechaPrimeraAsistencia,
-        FechaUltimaAsistencia = dto.FechaUltimaAsistencia,
-        Situacion = dto.Situacion,
-        Observaciones = dto.Observaciones,
-        FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
-        FechaHasta = dto.FechaHasta,
-        Estado = dto.Estado,
-    };
+        return new CertificadoParticipacion
+        {
+            IdParticipanteActividad = dto.IdParticipanteActividad,
+            IdActividad = dto.IdActividad,
+            IdOrganizacion = dto.IdOrganizacion,
+            IdUsuarioVoluntario = dto.IdUsuarioVoluntario,
+            FechaEmision = dto.FechaEmision,
+            HorasTotales = dto.HorasTotales,
+            DiasTotales = dto.DiasTotales,
+            FechaPrimeraAsistencia = dto.FechaPrimeraAsistencia,
+            FechaUltimaAsistencia = dto.FechaUltimaAsistencia,
+            Situacion = dto.Situacion,
+            Observaciones = dto.Observaciones,
+            FechaDesde = dto.FechaDesde ?? DateTime.UtcNow,
+            FechaHasta = dto.FechaHasta,
+            Estado = dto.Estado
+        };
+    }
 
     public static void UpdateFromDto(this CertificadoParticipacion entity, CertificacionParticipacionUpdateDto dto)
     {

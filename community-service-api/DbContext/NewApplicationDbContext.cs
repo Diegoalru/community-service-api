@@ -259,7 +259,7 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
 
             entity.ToTable("CERTIFICADO_PARTICIPACION", tb => tb.HasComment("Tabla que almacena los certificados de participación de los voluntarios"));
 
-            entity.HasIndex(e => new { e.IdParticipanteActividad, e.IdActividad, e.IdUsuarioVoluntario }, "UQ_CERT_PART").IsUnique();
+            entity.HasIndex(e => e.IdParticipanteActividad, "UQ_CERT_PART").IsUnique();
 
             entity.Property(e => e.IdCertificacion)
                 .HasDefaultValueSql("SYS_GUID()     ")
@@ -333,21 +333,20 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasComment("Situación del certificado: Pendiente (P), Generado (G), Emitido (E), Completado (C), Anulado (A)")
                 .HasColumnName("SITUACION");
 
+            entity.HasOne(d => d.IdActividadNavigation).WithMany(p => p.CertificadoParticipacion)
+                .HasForeignKey(d => d.IdActividad)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CERT_PART_ACT");
+
+            entity.HasOne(d => d.IdParticipanteActividadNavigation).WithOne(p => p.CertificadoParticipacion)
+                .HasForeignKey<CertificadoParticipacion>(d => d.IdParticipanteActividad)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CERT_PART_PART");
+
             entity.HasOne(d => d.IdUsuarioVoluntarioNavigation).WithMany(p => p.CertificadoParticipacion)
                 .HasForeignKey(d => d.IdUsuarioVoluntario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CERT_PART_USU");
-
-            entity.HasOne(d => d.Actividad).WithMany(p => p.CertificadoParticipacion)
-                .HasPrincipalKey(p => new { p.IdOrganizacion, p.IdActividad })
-                .HasForeignKey(d => new { d.IdOrganizacion, d.IdActividad })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CERT_PART_ACT");
-
-            entity.HasOne(d => d.ParticipanteActividad).WithOne(p => p.CertificadoParticipacion)
-                .HasForeignKey<CertificadoParticipacion>(d => new { d.IdParticipanteActividad, d.IdActividad, d.IdUsuarioVoluntario })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CERT_PART_PART");
         });
 
         modelBuilder.Entity<ControlProcesoGeneracionCer>(entity =>
@@ -411,23 +410,17 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
 
         modelBuilder.Entity<CoordinadorActividad>(entity =>
         {
-            entity.HasKey(e => new { e.IdCoordinadorActividad, e.IdOrganizacion, e.IdActividad }).HasName("PK_COORD_ACT");
+            entity.HasKey(e => e.IdCoordinadorActividad).HasName("PK_COORD_ACT");
 
             entity.ToTable("COORDINADOR_ACTIVIDAD", tb => tb.HasComment("Tabla que relaciona los coordinadores con las actividades"));
+
+            entity.HasIndex(e => new { e.IdActividad, e.IdUsuarioCoordinador }, "UQ_COORD_ACT_LOGICA").IsUnique();
 
             entity.Property(e => e.IdCoordinadorActividad)
                 .HasPrecision(10)
                 .HasDefaultValueSql("\"COMMUNITY\".\"SEQ_COORDINADOR_ACTIVIDAD\".\"NEXTVAL\"")
                 .HasComment("Identificador del registro")
                 .HasColumnName("ID_COORDINADOR_ACTIVIDAD");
-            entity.Property(e => e.IdOrganizacion)
-                .HasPrecision(10)
-                .HasComment("Identificador de la organización")
-                .HasColumnName("ID_ORGANIZACION");
-            entity.Property(e => e.IdActividad)
-                .HasPrecision(10)
-                .HasComment("Identificador de la actividad")
-                .HasColumnName("ID_ACTIVIDAD");
             entity.Property(e => e.Estado)
                 .HasMaxLength(1)
                 .IsUnicode(false)
@@ -444,10 +437,23 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasPrecision(6)
                 .HasComment("Fecha hasta la cual el registro es accesible")
                 .HasColumnName("FECHA_HASTA");
+            entity.Property(e => e.IdActividad)
+                .HasPrecision(10)
+                .HasComment("Identificador de la actividad")
+                .HasColumnName("ID_ACTIVIDAD");
+            entity.Property(e => e.IdOrganizacion)
+                .HasPrecision(10)
+                .HasComment("Identificador de la organización")
+                .HasColumnName("ID_ORGANIZACION");
             entity.Property(e => e.IdUsuarioCoordinador)
                 .HasPrecision(10)
                 .HasComment("Identificador del usuario coordinador")
                 .HasColumnName("ID_USUARIO_COORDINADOR");
+
+            entity.HasOne(d => d.IdActividadNavigation).WithMany(p => p.CoordinadorActividad)
+                .HasForeignKey(d => d.IdActividad)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_COORD_ACT_ACT");
 
             entity.HasOne(d => d.IdOrganizacionNavigation).WithMany(p => p.CoordinadorActividad)
                 .HasForeignKey(d => d.IdOrganizacion)
@@ -458,12 +464,6 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasForeignKey(d => d.IdUsuarioCoordinador)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_COORD_ACT_USU");
-
-            entity.HasOne(d => d.Actividad).WithMany(p => p.CoordinadorActividad)
-                .HasPrincipalKey(p => new { p.IdOrganizacion, p.IdActividad })
-                .HasForeignKey(d => new { d.IdOrganizacion, d.IdActividad })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_COORD_ACT_ACT");
         });
 
         modelBuilder.Entity<CorreoPendiente>(entity =>
@@ -668,23 +668,17 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
 
         modelBuilder.Entity<HorarioActividad>(entity =>
         {
-            entity.HasKey(e => new { e.IdHorarioActividad, e.IdOrganizacion, e.IdActividad }).HasName("PK_HOR_ACT");
+            entity.HasKey(e => e.IdHorarioActividad).HasName("PK_HOR_ACT");
 
             entity.ToTable("HORARIO_ACTIVIDAD", tb => tb.HasComment("Tabla que almacena los horarios de las actividades"));
+
+            entity.HasIndex(e => new { e.IdActividad, e.Fecha, e.HoraInicio }, "UQ_HOR_ACT_LOGICA").IsUnique();
 
             entity.Property(e => e.IdHorarioActividad)
                 .HasPrecision(10)
                 .HasDefaultValueSql("\"COMMUNITY\".\"SEQ_HORARIO_ACTIVIDAD\".\"NEXTVAL\"")
                 .HasComment("Identificador único del horario de la actividad")
                 .HasColumnName("ID_HORARIO_ACTIVIDAD");
-            entity.Property(e => e.IdOrganizacion)
-                .HasPrecision(10)
-                .HasComment("Identificador de la organización que crea el horario")
-                .HasColumnName("ID_ORGANIZACION");
-            entity.Property(e => e.IdActividad)
-                .HasPrecision(10)
-                .HasComment("Identificador de la actividad")
-                .HasColumnName("ID_ACTIVIDAD");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(255)
                 .IsUnicode(false)
@@ -718,6 +712,14 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasPrecision(6)
                 .HasComment("Hora de inicio del horario de la actividad")
                 .HasColumnName("HORA_INICIO");
+            entity.Property(e => e.IdActividad)
+                .HasPrecision(10)
+                .HasComment("Identificador de la actividad")
+                .HasColumnName("ID_ACTIVIDAD");
+            entity.Property(e => e.IdOrganizacion)
+                .HasPrecision(10)
+                .HasComment("Identificador de la organización que crea el horario")
+                .HasColumnName("ID_ORGANIZACION");
             entity.Property(e => e.IdUsuario)
                 .HasPrecision(10)
                 .HasComment("Identificador del usuario que crea el horario")
@@ -729,6 +731,11 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasComment("Situación del horario de la actividad: Iniciada (I), Publicada (P), Cancelada (C), Finalizada (F), Anulada (A)")
                 .HasColumnName("SITUACION");
 
+            entity.HasOne(d => d.IdActividadNavigation).WithMany(p => p.HorarioActividad)
+                .HasForeignKey(d => d.IdActividad)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_HOR_ACT_ACT");
+
             entity.HasOne(d => d.IdOrganizacionNavigation).WithMany(p => p.HorarioActividad)
                 .HasForeignKey(d => d.IdOrganizacion)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -738,12 +745,6 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasForeignKey(d => d.IdUsuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_HOR_ACT_USU");
-
-            entity.HasOne(d => d.Actividad).WithMany(p => p.HorarioActividad)
-                .HasPrincipalKey(p => new { p.IdOrganizacion, p.IdActividad })
-                .HasForeignKey(d => new { d.IdOrganizacion, d.IdActividad })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_HOR_ACT_ACT");
         });
 
         modelBuilder.Entity<LogError>(entity =>
@@ -904,23 +905,17 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
 
         modelBuilder.Entity<ParticipanteActividad>(entity =>
         {
-            entity.HasKey(e => new { e.IdParticipanteActividad, e.IdActividad, e.IdUsuarioVoluntario }).HasName("PK_PART_ACT");
+            entity.HasKey(e => e.IdParticipanteActividad).HasName("PK_PART_ACT");
 
             entity.ToTable("PARTICIPANTE_ACTIVIDAD", tb => tb.HasComment("Tabla que relaciona los participantes con las actividades"));
+
+            entity.HasIndex(e => new { e.IdActividad, e.IdUsuarioVoluntario }, "UQ_PART_ACT_LOGICA").IsUnique();
 
             entity.Property(e => e.IdParticipanteActividad)
                 .HasPrecision(10)
                 .HasDefaultValueSql("\"COMMUNITY\".\"SEQ_PARTICIPANTE_ACTIVIDAD\".\"NEXTVAL\"")
                 .HasComment("Identificador del registro")
                 .HasColumnName("ID_PARTICIPANTE_ACTIVIDAD");
-            entity.Property(e => e.IdActividad)
-                .HasPrecision(10)
-                .HasComment("Identificador de la actividad")
-                .HasColumnName("ID_ACTIVIDAD");
-            entity.Property(e => e.IdUsuarioVoluntario)
-                .HasPrecision(10)
-                .HasComment("Identificador del usuario voluntario participante")
-                .HasColumnName("ID_USUARIO_VOLUNTARIO");
             entity.Property(e => e.Estado)
                 .HasMaxLength(1)
                 .IsUnicode(false)
@@ -945,6 +940,10 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasPrecision(6)
                 .HasComment("Fecha de retiro del participante de la actividad")
                 .HasColumnName("FECHA_RETIRO");
+            entity.Property(e => e.IdActividad)
+                .HasPrecision(10)
+                .HasComment("Identificador de la actividad")
+                .HasColumnName("ID_ACTIVIDAD");
             entity.Property(e => e.IdHorarioActividad)
                 .HasPrecision(10)
                 .HasComment("Identificador del horario de la actividad")
@@ -953,12 +952,26 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasPrecision(10)
                 .HasComment("Identificador de la organización")
                 .HasColumnName("ID_ORGANIZACION");
+            entity.Property(e => e.IdUsuarioVoluntario)
+                .HasPrecision(10)
+                .HasComment("Identificador del usuario voluntario participante")
+                .HasColumnName("ID_USUARIO_VOLUNTARIO");
             entity.Property(e => e.Situacion)
                 .HasMaxLength(1)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasComment("Situación del participante en la actividad: Inicial (I), Activo (A), Retirado (R), Cancelado (C), Finalizado (F)")
                 .HasColumnName("SITUACION");
+
+            entity.HasOne(d => d.IdActividadNavigation).WithMany(p => p.ParticipanteActividad)
+                .HasForeignKey(d => d.IdActividad)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PART_ACT_ACT");
+
+            entity.HasOne(d => d.IdHorarioActividadNavigation).WithMany(p => p.ParticipanteActividad)
+                .HasForeignKey(d => d.IdHorarioActividad)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PART_ACT_HOR");
 
             entity.HasOne(d => d.IdOrganizacionNavigation).WithMany(p => p.ParticipanteActividad)
                 .HasForeignKey(d => d.IdOrganizacion)
@@ -969,17 +982,6 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasForeignKey(d => d.IdUsuarioVoluntario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PART_ACT_USU");
-
-            entity.HasOne(d => d.Actividad).WithMany(p => p.ParticipanteActividad)
-                .HasPrincipalKey(p => new { p.IdOrganizacion, p.IdActividad })
-                .HasForeignKey(d => new { d.IdOrganizacion, d.IdActividad })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PART_ACT_ACT");
-
-            entity.HasOne(d => d.HorarioActividad).WithMany(p => p.ParticipanteActividad)
-                .HasForeignKey(d => new { d.IdHorarioActividad, d.IdOrganizacion, d.IdActividad })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PART_ACT_HOR");
         });
 
         modelBuilder.Entity<Perfil>(entity =>
@@ -1172,29 +1174,17 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
 
         modelBuilder.Entity<RolUsuarioOrganizacion>(entity =>
         {
-            entity.HasKey(e => new { e.IdRolUsuarioOrganizacion, e.IdOrganizacion, e.IdUsuarioAsignado, e.IdRol }).HasName("PK_RUO");
+            entity.HasKey(e => e.IdRolUsuarioOrganizacion).HasName("PK_RUO");
 
             entity.ToTable("ROL_USUARIO_ORGANIZACION", tb => tb.HasComment("Tabla que relaciona los usuarios con sus organizaciones y sus roles"));
 
-            entity.HasIndex(e => new { e.IdOrganizacion, e.IdUsuarioAsignado, e.IdRol }, "UQ_RUO").IsUnique();
+            entity.HasIndex(e => new { e.IdOrganizacion, e.IdUsuarioAsignado, e.IdRol }, "UQ_RUO_COMPUESTA").IsUnique();
 
             entity.Property(e => e.IdRolUsuarioOrganizacion)
                 .HasPrecision(10)
                 .HasDefaultValueSql("\"COMMUNITY\".\"SEQ_ROL_USUARIO_ORGANIZACION\".\"NEXTVAL\"")
                 .HasComment("Identificador del registro")
                 .HasColumnName("ID_ROL_USUARIO_ORGANIZACION");
-            entity.Property(e => e.IdOrganizacion)
-                .HasPrecision(10)
-                .HasComment("Identificador de la organización")
-                .HasColumnName("ID_ORGANIZACION");
-            entity.Property(e => e.IdUsuarioAsignado)
-                .HasPrecision(10)
-                .HasComment("Identificador del usuario asignado")
-                .HasColumnName("ID_USUARIO_ASIGNADO");
-            entity.Property(e => e.IdRol)
-                .HasPrecision(10)
-                .HasComment("Identificador del rol")
-                .HasColumnName("ID_ROL");
             entity.Property(e => e.EsActivo)
                 .HasMaxLength(1)
                 .IsUnicode(false)
@@ -1218,10 +1208,22 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
                 .HasPrecision(6)
                 .HasComment("Fecha hasta la cual el registro es accesible")
                 .HasColumnName("FECHA_HASTA");
+            entity.Property(e => e.IdOrganizacion)
+                .HasPrecision(10)
+                .HasComment("Identificador de la organización")
+                .HasColumnName("ID_ORGANIZACION");
+            entity.Property(e => e.IdRol)
+                .HasPrecision(10)
+                .HasComment("Identificador del rol")
+                .HasColumnName("ID_ROL");
             entity.Property(e => e.IdUsuarioAdministrador)
                 .HasPrecision(10)
                 .HasComment("Identificador del usuario administrador")
                 .HasColumnName("ID_USUARIO_ADMINISTRADOR");
+            entity.Property(e => e.IdUsuarioAsignado)
+                .HasPrecision(10)
+                .HasComment("Identificador del usuario asignado")
+                .HasColumnName("ID_USUARIO_ASIGNADO");
 
             entity.HasOne(d => d.IdOrganizacionNavigation).WithMany(p => p.RolUsuarioOrganizacion)
                 .HasForeignKey(d => d.IdOrganizacion)

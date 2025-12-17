@@ -64,11 +64,11 @@ public partial class ParticipanteActividad
     /// </summary>
     public string Estado { get; set; } = null!;
 
-    public virtual Actividad Actividad { get; set; } = null!;
-
     public virtual CertificadoParticipacion? CertificadoParticipacion { get; set; }
 
-    public virtual HorarioActividad HorarioActividad { get; set; } = null!;
+    public virtual Actividad IdActividadNavigation { get; set; } = null!;
+
+    public virtual HorarioActividad IdHorarioActividadNavigation { get; set; } = null!;
 
     public virtual Organizacion IdOrganizacionNavigation { get; set; } = null!;
 

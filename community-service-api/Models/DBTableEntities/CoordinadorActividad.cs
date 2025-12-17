@@ -44,7 +44,7 @@ public partial class CoordinadorActividad
     /// </summary>
     public string Estado { get; set; } = null!;
 
-    public virtual Actividad Actividad { get; set; } = null!;
+    public virtual Actividad IdActividadNavigation { get; set; } = null!;
 
     public virtual Organizacion IdOrganizacionNavigation { get; set; } = null!;
 

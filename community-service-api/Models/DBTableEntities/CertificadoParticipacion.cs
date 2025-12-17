@@ -89,11 +89,11 @@ public partial class CertificadoParticipacion
     /// </summary>
     public string Estado { get; set; } = null!;
 
-    public virtual Actividad Actividad { get; set; } = null!;
-
     public virtual ICollection<CorreoPendiente> CorreoPendiente { get; set; } = new List<CorreoPendiente>();
 
-    public virtual Usuario IdUsuarioVoluntarioNavigation { get; set; } = null!;
+    public virtual Actividad IdActividadNavigation { get; set; } = null!;
 
-    public virtual ParticipanteActividad ParticipanteActividad { get; set; } = null!;
+    public virtual ParticipanteActividad IdParticipanteActividadNavigation { get; set; } = null!;
+
+    public virtual Usuario IdUsuarioVoluntarioNavigation { get; set; } = null!;
 }
