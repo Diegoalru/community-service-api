@@ -7,7 +7,7 @@ public partial class NewApplicationDbContext(DbContextOptions<NewApplicationDbCo
     : Microsoft.EntityFrameworkCore.DbContext(options)
 {
     public virtual DbSet<Actividad> Actividad { get; set; }
-
+    public virtual DbSet<AsistenciaActividad> AsistenciaActividad { get; set; }
     public virtual DbSet<Canton> Canton { get; set; }
 
     public virtual DbSet<CategoriaActividad> CategoriaActividad { get; set; }
