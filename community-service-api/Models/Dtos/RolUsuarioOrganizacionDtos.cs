@@ -7,6 +7,18 @@ public class RolUsuarioOrganizacionDto
 {
     public int IdRolUsuarioOrganizacion { get; set; }
 
+    public int IdOrganizacion { get; set; }
+
+    public int IdUsuarioAsignado { get; set; }
+
+    public int IdUsuarioAdministrador { get; set; }
+
+    public int IdRol { get; set; }
+
+    public DateTime FechaDesde { get; set; }
+
+    public DateTime? FechaHasta { get; set; }
+
     public char EsActivo { get; set; }
 
     public char Estado { get; set; }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using community_service_api.Models.Dtos;
 using community_service_api.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace community_service_api.Controllers;
 
@@ -21,6 +22,18 @@ public class ActividadesController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var actividades = await _service.GetAllAsync();
+        return Ok(actividades);
+    }
+
+    [HttpGet("available-activities")]
+    public async Task<IActionResult> GetVigentesDetalle([FromQuery] int idUsuario)
+    {
+        if (idUsuario <= 0)
+        {
+            return BadRequest(new { message = "El parámetro 'idUsuario' debe ser mayor a 0." });
+        }
+
+        var actividades = await _service.GetVigentesDetalleAsync(idUsuario);
         return Ok(actividades);
     }
 
@@ -65,5 +78,31 @@ public class ActividadesController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpPost("inscribir-usuario")]
+    public async Task<IActionResult> InscribirUsuario([FromBody] InscribirUsuarioActividadRequestDto dto)
+    {
+        try
+        {
+            var result = await _service.InscribirUsuarioAsync(dto);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

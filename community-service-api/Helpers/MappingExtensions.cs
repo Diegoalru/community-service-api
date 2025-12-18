@@ -278,6 +278,12 @@ public static class MappingExtensions
         return new RolUsuarioOrganizacionDto
         {
             IdRolUsuarioOrganizacion = entity.IdRolUsuarioOrganizacion,
+            IdOrganizacion = entity.IdOrganizacion,
+            IdUsuarioAsignado = entity.IdUsuarioAsignado,
+            IdUsuarioAdministrador = entity.IdUsuarioAdministrador,
+            IdRol = entity.IdRol,
+            FechaDesde = entity.FechaDesde,
+            FechaHasta = entity.FechaHasta,
             EsActivo = entity.EsActivo[0],
             Estado = entity.Estado[0]
         };
