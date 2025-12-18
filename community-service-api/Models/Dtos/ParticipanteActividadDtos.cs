@@ -51,3 +51,10 @@ public class ParticipanteActividadCreateDto
 public class ParticipanteActividadUpdateDto : ParticipanteActividadCreateDto
 {
 }
+
+public class SituacionUpdateRequestDto
+{
+    [Required]
+    [RegularExpression("[IARCF]")]
+    public char Situacion { get; set; }
+}

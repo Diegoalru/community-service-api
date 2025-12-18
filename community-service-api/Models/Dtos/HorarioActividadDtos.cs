@@ -59,3 +59,16 @@ public class HorarioActividadCreateDto
 public class HorarioActividadUpdateDto : HorarioActividadCreateDto
 {
 }
+
+public class ParticipanteActividadDisplayDto
+{
+    public int IdParticipanteActividad { get; set; }
+    public int IdUsuarioVoluntario { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string NombreCompleto { get; set; } = string.Empty;
+    public char Situacion { get; set; }
+    public DateTime FechaInscripcion { get; set; }
+    public DateTime? FechaRetiro { get; set; }
+    public char Estado { get; set; }
+    public decimal HorasActividad { get; set; }
+}
