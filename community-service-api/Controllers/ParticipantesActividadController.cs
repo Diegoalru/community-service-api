@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using community_service_api.Models.Dtos;
 using community_service_api.Services;
+using System.Security.Claims;
 
 namespace community_service_api.Controllers;
 
@@ -66,4 +67,13 @@ public class ParticipantesActividadController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{id:int}/situacion")]
+    public async Task<IActionResult> CambiarSituacion(int id, [FromBody] SituacionUpdateRequestDto dto)
+    {
+        var idUsuarioSolicitante = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        await _service.CambiarSituacionAsync(id, dto, idUsuarioSolicitante);
+        return NoContent();
+    }
 }
+

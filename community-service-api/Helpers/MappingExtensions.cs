@@ -521,20 +521,6 @@ public static class MappingExtensions
         entity.Estado = char.ToString(dto.Estado);
     }
 
-    public static AsistenciaActividadDto ToDto(this AsistenciaActividad e)
-    {
-        return new AsistenciaActividadDto
-        {
-            IdAsistenciaActividad = e.IdAsistenciaActividad,
-            ActividadId = e.ActividadId,
-            UsuarioId = e.UsuarioId,
-            Fecha = e.Fecha,
-            Horas = e.Horas,
-            Observacion = e.Observacion
-        };
-    }
-
-
     // CertificadoParticipacion mappings
     public static CertificacionParticipacionDto ToDto(this CertificadoParticipacion entity)
     {

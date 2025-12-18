@@ -103,7 +103,7 @@ builder.Services.AddScoped<ICertificacionParticipacionService, CertificacionPart
 builder.Services.AddScoped<IUniversidadService, UniversidadService>();
 builder.Services.AddScoped<IIntegracionService, IntegracionService>();
 builder.Services.AddScoped<IProcedureRepository, ProcedureRepository>();
-builder.Services.AddScoped<IAsistenciaActividadService, AsistenciaActividadService>();
+
 builder.Services.AddScoped<IMailerService, MailerService>();
 builder.Services.AddScoped<IEmailQueueService, EmailQueueService>();
 builder.Services.AddScoped<IJwtService, JwtService>();

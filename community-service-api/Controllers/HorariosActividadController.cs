@@ -66,4 +66,11 @@ public class HorariosActividadController : ControllerBase
 
         return NoContent();
     }
+    
+    [HttpGet("{horarioId:int}/participantes")]
+    public async Task<IActionResult> GetParticipantesByHorario(int horarioId)
+    {
+        var participantes = await _service.GetParticipantesByHorarioAsync(horarioId);
+        return Ok(participantes);
+    }
 }
