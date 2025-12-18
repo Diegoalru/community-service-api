@@ -19,6 +19,7 @@ public interface IActividadService
     Task<bool> UpdateAsync(int id, ActividadUpdateDto dto);
     Task<bool> DeleteAsync(int id);
     Task<InscripcionActividadResponseDto> InscribirUsuarioAsync(InscribirUsuarioActividadRequestDto dto);
+    Task<DesinscripcionActividadResponseDto> DesinscribirUsuarioAsync(InscribirUsuarioActividadRequestDto dto);
     Task<IEnumerable<ActividadDetalleDto>> GetVigentesDetalleAsync(int idUsuario);
 }
 
@@ -96,18 +97,20 @@ public class ActividadService : IActividadService
             throw new UnauthorizedAccessException("El usuario no tiene el rol Voluntario (IdRol=4) activo en la organización.");
         }
 
-        // 2) Evitar doble inscripción
-        var yaInscrito = await _db.ParticipanteActividad
-            .AsNoTracking()
-            .AnyAsync(p =>
+        // 2) Evitar doble inscripción y reusar registro si el usuario ya se había inscrito y luego se desinscribió
+        var participanteExistente = await _db.ParticipanteActividad
+            .Where(p =>
                 p.IdOrganizacion == dto.IdOrganizacion &&
                 p.IdActividad == dto.IdActividad &&
+                p.IdHorarioActividad == dto.IdHorarioActividad &&
                 p.IdUsuarioVoluntario == dto.IdUsuario &&
-                p.Estado == "A" &&
-                p.FechaHasta == null);
+                p.Estado == "A")
+            .OrderByDescending(p => p.FechaInscripcion)
+            .FirstOrDefaultAsync();
 
-        if (yaInscrito)
+        if (participanteExistente is not null && participanteExistente.FechaHasta == null)
         {
+            // Ya está activo
             throw new InvalidOperationException("El usuario ya está inscrito en la actividad.");
         }
 
@@ -150,24 +153,43 @@ public class ActividadService : IActividadService
             throw new InvalidOperationException("No hay cupos disponibles para la actividad.");
         }
 
-        // 6) Crear registro en PARTICIPANTE_ACTIVIDAD
+        // 6) Crear registro o reactivar registro existente (si estaba desinscrito)
         var ahora = DateTime.UtcNow;
-        var participante = new ParticipanteActividad
-        {
-            IdOrganizacion = dto.IdOrganizacion,
-            IdActividad = dto.IdActividad,
-            IdHorarioActividad = dto.IdHorarioActividad,
-            IdUsuarioVoluntario = dto.IdUsuario,
-            FechaInscripcion = ahora,
-            FechaRetiro = null,
-            Situacion = "I", // Inicial
-            FechaDesde = ahora,
-            FechaHasta = null,
-            Estado = "A"
-        };
 
-        _db.ParticipanteActividad.Add(participante);
-        await _db.SaveChangesAsync();
+        ParticipanteActividad participante;
+        if (participanteExistente is not null)
+        {
+            // Reactivar
+            participanteExistente.FechaInscripcion = ahora;
+            participanteExistente.FechaRetiro = null;
+            participanteExistente.Situacion = "I"; // Inicial / reinscrito
+            participanteExistente.FechaDesde = ahora;
+            participanteExistente.FechaHasta = null;
+            // Estado se mantiene "A"
+
+            await _db.SaveChangesAsync();
+            participante = participanteExistente;
+        }
+        else
+        {
+            // Nuevo
+            participante = new ParticipanteActividad
+            {
+                IdOrganizacion = dto.IdOrganizacion,
+                IdActividad = dto.IdActividad,
+                IdHorarioActividad = dto.IdHorarioActividad,
+                IdUsuarioVoluntario = dto.IdUsuario,
+                FechaInscripcion = ahora,
+                FechaRetiro = null,
+                Situacion = "I", // Inicial
+                FechaDesde = ahora,
+                FechaHasta = null,
+                Estado = "A"
+            };
+
+            _db.ParticipanteActividad.Add(participante);
+            await _db.SaveChangesAsync();
+        }
 
         await tx.CommitAsync();
 
@@ -186,6 +208,78 @@ public class ActividadService : IActividadService
             IdActividad = dto.IdActividad,
             IdHorarioActividad = dto.IdHorarioActividad,
             FechaInscripcion = participante.FechaInscripcion,
+            CuposRestantes = cuposRestantes
+        };
+    }
+
+    public async Task<DesinscripcionActividadResponseDto> DesinscribirUsuarioAsync(InscribirUsuarioActividadRequestDto dto)
+    {
+        if (dto.IdUsuario <= 0 || dto.IdOrganizacion <= 0 || dto.IdActividad <= 0 || dto.IdHorarioActividad <= 0)
+        {
+            throw new ArgumentException("IdUsuario, IdOrganizacion, IdActividad e IdHorarioActividad deben ser mayores a 0.");
+        }
+
+        await using var tx = await _db.Database.BeginTransactionAsync();
+
+        // Opcional (consistente con inscripción): validar rol voluntario (IdRol=4)
+        var esVoluntario = await _db.RolUsuarioOrganizacion
+            .AsNoTracking()
+            .AnyAsync(r =>
+                r.IdOrganizacion == dto.IdOrganizacion &&
+                r.IdUsuarioAsignado == dto.IdUsuario &&
+                r.IdRol == 4 &&
+                r.Estado == "A" &&
+                r.EsActivo == "A");
+
+        if (!esVoluntario)
+        {
+            throw new UnauthorizedAccessException("El usuario no tiene el rol Voluntario (IdRol=4) activo en la organización.");
+        }
+
+        // Buscar inscripción activa exacta para este horario
+        var participante = await _db.ParticipanteActividad
+            .SingleOrDefaultAsync(p =>
+                p.IdOrganizacion == dto.IdOrganizacion &&
+                p.IdActividad == dto.IdActividad &&
+                p.IdHorarioActividad == dto.IdHorarioActividad &&
+                p.IdUsuarioVoluntario == dto.IdUsuario &&
+                p.Estado == "A" &&
+                p.FechaHasta == null);
+
+        if (participante is null)
+        {
+            throw new InvalidOperationException("El usuario no está inscrito (o ya fue desinscrito) en este evento/horario.");
+        }
+
+        var ahora = DateTime.UtcNow;
+        participante.FechaRetiro = ahora;
+        participante.Situacion = "R"; // Retirado
+        participante.FechaHasta = ahora;
+
+        await _db.SaveChangesAsync();
+
+        // Sumar cupo a la actividad
+        await _db.Database.ExecuteSqlInterpolatedAsync($@"
+UPDATE ACTIVIDAD
+SET CUPOS = CUPOS + 1
+WHERE ID_ACTIVIDAD = {dto.IdActividad}
+  AND ID_ORGANIZACION = {dto.IdOrganizacion}");
+
+        await tx.CommitAsync();
+
+        var cuposRestantes = await _db.Actividad
+            .AsNoTracking()
+            .Where(a => a.IdActividad == dto.IdActividad && a.IdOrganizacion == dto.IdOrganizacion)
+            .Select(a => a.Cupos)
+            .FirstOrDefaultAsync();
+
+        return new DesinscripcionActividadResponseDto
+        {
+            IdUsuario = dto.IdUsuario,
+            IdOrganizacion = dto.IdOrganizacion,
+            IdActividad = dto.IdActividad,
+            IdHorarioActividad = dto.IdHorarioActividad,
+            FechaRetiro = participante.FechaRetiro ?? ahora,
             CuposRestantes = cuposRestantes
         };
     }

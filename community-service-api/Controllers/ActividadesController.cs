@@ -105,4 +105,30 @@ public class ActividadesController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPost("desinscribir-usuario")]
+    public async Task<IActionResult> DesinscribirUsuario([FromBody] InscribirUsuarioActividadRequestDto dto)
+    {
+        try
+        {
+            var result = await _service.DesinscribirUsuarioAsync(dto);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }
