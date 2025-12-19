@@ -13,7 +13,7 @@ namespace community_service_api.Services;
 
 public interface IActividadService
 {
-    Task<IEnumerable<ActividadDto>> GetAllAsync();
+    Task<IEnumerable<Actividad>> GetAllAsync();
     Task<ActividadDto?> GetByIdAsync(int id);
     Task<ActividadDto> CreateAsync(ActividadCreateDto dto);
     Task<bool> UpdateAsync(int id, ActividadUpdateDto dto);
@@ -34,10 +34,9 @@ public class ActividadService : IActividadService
         _db = db;
     }
 
-    public async Task<IEnumerable<ActividadDto>> GetAllAsync()
+    public async Task<IEnumerable<Actividad>> GetAllAsync()
     {
-        var entities = await _repository.GetAllAsync();
-        return entities.Select(e => e.ToDto());
+        return await _repository.GetAllAsync();
     }
 
     public async Task<ActividadDto?> GetByIdAsync(int id)
@@ -131,6 +130,8 @@ public class ActividadService : IActividadService
                 h.IdHorarioActividad == dto.IdHorarioActividad &&
                 h.IdOrganizacion == dto.IdOrganizacion &&
                 h.IdActividad == dto.IdActividad &&
+                (h.Situacion == "I" ||
+                h.Situacion == "P") &&
                 h.Estado == "A" &&
                 h.FechaHasta == null);
 
@@ -287,14 +288,31 @@ WHERE ID_ACTIVIDAD = {dto.IdActividad}
     public async Task<IEnumerable<ActividadDetalleDto>> GetVigentesDetalleAsync(int idUsuario)
     {
         // "Vigentes / no vencidas" por horario: debe existir al menos un HorarioActividad cuyo HoraFin sea >= ahora.
+        if (idUsuario <= 0)
+        {
+            throw new ArgumentException("idUsuario debe ser mayor a 0.");
+        }
+
         var ahora = DateTime.UtcNow;
 
         return await _db.Actividad
             .AsNoTracking()
-            .Where(a => a.HorarioActividad.Any(h =>
-                h.Estado == "A" &&
-                h.FechaHasta == null &&
-                h.HoraFin >= ahora))
+            .Where(a =>
+                // Actividad en estado permitido
+                (a.Situacion == "I" || a.Situacion == "P") &&
+                // Usuario asociado a la organización como Voluntario (IdRol=4)
+                _db.RolUsuarioOrganizacion.Any(r =>
+                    r.IdOrganizacion == a.IdOrganizacion &&
+                    r.IdUsuarioAsignado == idUsuario &&
+                    r.IdRol == 4 &&
+                    r.Estado == "A" &&
+                    r.EsActivo == "A") &&
+                // Debe existir al menos un horario activo (y no vencido)
+                a.HorarioActividad.Any(h =>
+                    h.Estado == "A" &&
+                    h.FechaHasta == null &&
+                    (h.Situacion == "I" || h.Situacion == "P") &&
+                    h.HoraFin >= ahora))
             .Select(a => new ActividadDetalleDto
             {
                 IdActividad = a.IdActividad,
@@ -341,7 +359,8 @@ WHERE ID_ACTIVIDAD = {dto.IdActividad}
                 Horarios = a.HorarioActividad
                     .Where(h =>
                         h.Estado == "A" &&
-                        h.FechaHasta == null)
+                        h.FechaHasta == null &&
+                        (h.Situacion == "I" || h.Situacion == "P"))
                     .OrderBy(h => h.Fecha)
                     .ThenBy(h => h.HoraInicio)
                     .Select(h => new HorarioActividadBasicoDto
