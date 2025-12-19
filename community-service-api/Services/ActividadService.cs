@@ -484,17 +484,13 @@ WHERE ID_ACTIVIDAD = {dto.IdActividad}
             throw new ArgumentException("idUsuario debe ser mayor a 0.");
         }
 
-        var ahora = DateTime.UtcNow;
-
-        // Tomamos participaciones "válidas" para acumulación:
-        // - ParticipanteActividad activo (Estado='A') y vigente (FechaHasta null)
-        // - El usuario debió estar inscrito antes de que terminara el horario (FechaInscripcion <= HoraFin)
-        // - Horario activo y no borrado lógico
-        // - Horario ya finalizó (HoraFin <= ahora) para contar horas ya realizadas
-
-        // Nota: usamos JOIN explícito para no depender de navigations (FK compuesta hacia HorarioActividad).
-        //        p.FechaHasta == null(inscripción vigente / activa)
-        //p.FechaInscripcion <= h.HoraFin(evita contar horas si el usuario se inscribe / re - activa después de que el horario ya terminó)
+        // Alineado con la lógica de jobs en BD (PKG_JOBS_LOGIC / generación de certificados):
+        // - ParticipanteActividad: Situacion='F' y Estado='A'
+        // - HorarioActividad:     Situacion='F' y Estado='A'
+        // - Actividad:           Situacion='F' y Estado='A'
+        //
+        // Nota: NO usamos FechaHasta/HoraFin para determinar "finalizado"; eso lo define Situacion='F'
+        //       (actualizado por los procesos automáticos de BD).
         var rows = await (
                 from p in _db.ParticipanteActividad.AsNoTracking()
                 join h in _db.HorarioActividad.AsNoTracking()
@@ -505,11 +501,13 @@ WHERE ID_ACTIVIDAD = {dto.IdActividad}
                     equals new { a.IdActividad, a.IdOrganizacion }
                 where p.IdUsuarioVoluntario == idUsuario
                       && p.Estado == "A"
-                      && p.FechaHasta == null
-                      && p.FechaInscripcion <= h.HoraFin
+                      && p.Situacion == "F"
                       && h.Estado == "A"
                       && h.FechaHasta == null
-                      && h.HoraFin <= ahora
+                      && h.Situacion == "F"
+                      && a.Estado == "A"
+                      && a.FechaHasta == null
+                      && a.Situacion == "F"
                 select new
                 {
                     p.IdOrganizacion,
