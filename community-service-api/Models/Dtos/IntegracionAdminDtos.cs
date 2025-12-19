@@ -209,3 +209,26 @@ public class CambiarRolUsuarioDto
     [JsonPropertyName("idNuevoRol")]
     public int IdNuevoRol { get; set; }
 }
+
+// Definition for RolUsuarioApi
+public class RolUsuarioApi
+{
+    [JsonPropertyName("idRol")]
+    public int IdRol { get; set; }
+    [JsonPropertyName("nombreRol")]
+    public string NombreRol { get; set; } = string.Empty;
+    [JsonPropertyName("esAdmin")]
+    public string EsAdmin { get; set; } = string.Empty; // "true" or "false"
+}
+
+public class OrganizacionConEstadoApi
+{
+    [JsonPropertyName("idOrganizacion")]
+    public int IdOrganizacion { get; set; }
+    [JsonPropertyName("nombre")]
+    public string Nombre { get; set; } = string.Empty;
+    [JsonPropertyName("descripcion")]
+    public string? Descripcion { get; set; }
+    [JsonPropertyName("rolesUsuario")] // Changed to rolesUsuario
+    public List<RolUsuarioApi>? RolesUsuario { get; set; } // Changed to List<RolUsuarioApi>
+}
