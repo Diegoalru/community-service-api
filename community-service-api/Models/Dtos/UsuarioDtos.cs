@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace community_service_api.Models.Dtos;
 
@@ -61,11 +62,13 @@ public class UsuarioLoginDto
 {
     [Required]
     [MaxLength(200)]
+    [JsonPropertyName("username")]
     public string Username { get; set; } = string.Empty;
 
     [Required]
     [MinLength(6)]
     [MaxLength(255)]
+    [JsonPropertyName("password")]
     public string Password { get; set; } = string.Empty;
 }
 
