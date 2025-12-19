@@ -36,6 +36,30 @@ public class PerfilesController : ControllerBase
         return Ok(perfil);
     }
 
+    [HttpGet("{id:int}/detalle")]
+    public async Task<IActionResult> GetDetalleById(int id)
+    {
+        var perfil = await _service.GetDetalleByIdAsync(id);
+        if (perfil is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(perfil);
+    }
+
+    [HttpGet("usuario/{idUsuario:int}/detalle")]
+    public async Task<IActionResult> GetDetalleByUsuarioId(int idUsuario)
+    {
+        var perfil = await _service.GetDetalleByUsuarioIdAsync(idUsuario);
+        if (perfil is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(perfil);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] PerfilCreateDto dto)
     {

@@ -24,8 +24,6 @@ public class ActividadDetalleDto
     public CategoriaActividadBasicaDto Categoria { get; set; } = new();
     public UbicacionBasicaDto Ubicacion { get; set; } = new();
     public List<HorarioActividadBasicoDto> Horarios { get; set; } = new();
-
-    public bool UsuarioInscrito { get; set; }
 }
 
 public class OrganizacionBasicaDto
@@ -71,6 +69,7 @@ public class HorarioActividadBasicoDto
     public string? Descripcion { get; set; }
     public char Situacion { get; set; }
     public char Estado { get; set; }
+    public bool UsuarioInscrito { get; set; }
 }
 
 

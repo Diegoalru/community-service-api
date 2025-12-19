@@ -37,6 +37,18 @@ public class ActividadesController : ControllerBase
         return Ok(actividades);
     }
 
+    [HttpGet("mis-horas")]
+    public async Task<IActionResult> GetMisHoras([FromQuery] int idUsuario)
+    {
+        if (idUsuario <= 0)
+        {
+            return BadRequest(new { message = "El parámetro 'idUsuario' debe ser mayor a 0." });
+        }
+
+        var result = await _service.GetMisHorasAsync(idUsuario);
+        return Ok(result);
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
