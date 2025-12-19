@@ -51,9 +51,11 @@ public class ActividadDetalleParaCreacionDto
     [Required]
     [JsonPropertyName("idCategoria")]
     public int IdCategoria { get; set; }
+    
     [Required]
-    [JsonPropertyName("idUbicacion")]
-    public int IdUbicacion { get; set; }
+    [JsonPropertyName("ubicacion")]
+    public UbicacionRegDto Ubicacion { get; set; } = new();
+
     [Required]
     [StringLength(100)]
     [JsonPropertyName("nombre")]
@@ -224,9 +226,11 @@ public class ActividadDetalleParaActualizacionDto
     [Required]
     [JsonPropertyName("idCategoria")]
     public int IdCategoria { get; set; }
+    
     [Required]
-    [JsonPropertyName("idUbicacion")]
-    public int IdUbicacion { get; set; }
+    [JsonPropertyName("ubicacion")]
+    public UbicacionActDto Ubicacion { get; set; } = new();
+
     [Required]
     [StringLength(100)]
     [JsonPropertyName("nombre")]
