@@ -16,6 +16,13 @@ public interface IIntegracionService
     Task<Respuesta> RestablecerPasswordAsync(ResetPasswordDto dto);
     Task<Respuesta> CambiarPasswordAsync(ChangePasswordDto dto);
     Task<Respuesta> ReenviarActivacionAsync(ResendActivationDto dto);
+    Task<Respuesta> CrearOrganizacionAsync(OrganizacionCreacionDto dto);
+    Task<Respuesta> CrearActividadAsync(ActividadCreacionIntegracionDto dto);
+    Task<Respuesta> CrearHorarioAsync(HorarioCreacionIntegracionDto dto);
+    Task<Respuesta> InscribirParticipanteAsync(InscripcionParticipanteDto dto);
+    Task<Respuesta> AsignarRolAsync(AsignacionRolDto dto);
+    Task<Respuesta> ActualizarPerfilCompletoAsync(ActualizacionPerfilCompletoDto dto);
+    Task<Respuesta> ActualizarActividadAsync(ActividadActualizacionIntegracionDto dto);
 }
 
 public class IntegracionService(
@@ -447,6 +454,296 @@ public class IntegracionService(
             };
         }
     }
+
+    public async Task<Respuesta> CrearOrganizacionAsync(OrganizacionCreacionDto dto)
+    {
+        logger.LogInformation("Iniciando creación de organización: {NombreOrganizacion}", dto.Nombre);
+
+        await procedureRepository.BeginTransactionAsync();
+        try
+        {
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithOutputNumber("PN_ID_ORGANIZACION")
+                .WithOutputVarchar("PV_MENSAJE", 4000)
+                .WithOutputNumber("PN_CODIGO")
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_CREAR_ORGANIZACION_JSON", dyParam);
+
+            var idOrganizacion = dyParam.Get<int?>("PN_ID_ORGANIZACION");
+            var mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty;
+            var codigo = dyParam.Get<int?>("PN_CODIGO") ?? 0;
+
+            if (idOrganizacion.HasValue && idOrganizacion > 0)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Organización creada exitosamente: {NombreOrganizacion}, ID: {IdOrganizacion}", dto.Nombre, idOrganizacion);
+                return new Respuesta { Exito = 1, Mensaje = mensaje, IdEntidad = idOrganizacion };
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Creación de organización fallida: {NombreOrganizacion}, Código: {Codigo}, Mensaje: {Mensaje}", dto.Nombre, codigo, mensaje);
+                return new Respuesta { Exito = 0, Codigo = codigo, Mensaje = mensaje };
+            }
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico en creación de organización: {NombreOrganizacion}", dto.Nombre);
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al crear la organización. {ex.Message}" };
+        }
+    }
+
+    public async Task<Respuesta> CrearActividadAsync(ActividadCreacionIntegracionDto dto)
+    {
+        logger.LogInformation("Iniciando creación de actividad: {NombreActividad}", dto.Actividad.Nombre);
+
+        await procedureRepository.BeginTransactionAsync();
+        try
+        {
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithOutputNumber("PN_ID_ACTIVIDAD")
+                .WithOutputVarchar("PV_MENSAJE", 4000)
+                .WithOutputNumber("PN_CODIGO")
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_CREAR_ACTIVIDAD_JSON", dyParam);
+
+            var idActividad = dyParam.Get<int?>("PN_ID_ACTIVIDAD");
+            var mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty;
+            var codigo = dyParam.Get<int?>("PN_CODIGO") ?? 0;
+
+            if (idActividad.HasValue && idActividad > 0)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Actividad creada exitosamente: {NombreActividad}, ID: {IdActividad}", dto.Actividad.Nombre, idActividad);
+                return new Respuesta { Exito = 1, Mensaje = mensaje, IdEntidad = idActividad };
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Creación de actividad fallida: {NombreActividad}, Código: {Codigo}, Mensaje: {Mensaje}", dto.Actividad.Nombre, codigo, mensaje);
+                return new Respuesta { Exito = 0, Codigo = codigo, Mensaje = mensaje };
+            }
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico en creación de actividad: {NombreActividad}", dto.Actividad.Nombre);
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al crear la actividad. {ex.Message}" };
+        }
+    }
+
+    public async Task<Respuesta> CrearHorarioAsync(HorarioCreacionIntegracionDto dto)
+    {
+        logger.LogInformation("Iniciando creación de horario para la actividad ID: {IdActividad}", dto.IdActividad);
+
+        await procedureRepository.BeginTransactionAsync();
+        try
+        {
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithOutputNumber("PN_ID_HORARIO")
+                .WithOutputVarchar("PV_MENSAJE", 4000)
+                .WithOutputNumber("PN_CODIGO")
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_CREAR_HORARIO_JSON", dyParam);
+
+            var idHorario = dyParam.Get<int?>("PN_ID_HORARIO");
+            var mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty;
+            var codigo = dyParam.Get<int?>("PN_CODIGO") ?? 0;
+
+            if (idHorario.HasValue && idHorario > 0)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Horario creado exitosamente. ID: {IdHorario}", idHorario);
+                return new Respuesta { Exito = 1, Mensaje = mensaje, IdEntidad = idHorario };
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Creación de horario fallida para actividad ID: {IdActividad}, Código: {Codigo}, Mensaje: {Mensaje}", dto.IdActividad, codigo, mensaje);
+                return new Respuesta { Exito = 0, Codigo = codigo, Mensaje = mensaje };
+            }
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico en creación de horario para actividad ID: {IdActividad}", dto.IdActividad);
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al crear el horario. {ex.Message}" };
+        }
+    }
+
+    public async Task<Respuesta> InscribirParticipanteAsync(InscripcionParticipanteDto dto)
+    {
+        logger.LogInformation("Iniciando inscripción de participante {IdUsuario} en actividad {IdActividad}", dto.IdUsuarioVoluntario, dto.IdActividad);
+
+        await procedureRepository.BeginTransactionAsync();
+        try
+        {
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithOutputNumber("PN_ID_PARTICIPANTE")
+                .WithOutputVarchar("PV_MENSAJE", 4000)
+                .WithOutputNumber("PN_CODIGO")
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_INSCRIBIR_PARTICIPANTE_JSON", dyParam);
+
+            var idParticipante = dyParam.Get<int?>("PN_ID_PARTICIPANTE");
+            var mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty;
+            var codigo = dyParam.Get<int?>("PN_CODIGO") ?? 0;
+
+            if (idParticipante.HasValue && idParticipante > 0)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Inscripción exitosa. ID: {IdParticipante}", idParticipante);
+                return new Respuesta { Exito = 1, Mensaje = mensaje, IdEntidad = idParticipante };
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Inscripción fallida para usuario {IdUsuario} en actividad {IdActividad}. Código: {Codigo}, Mensaje: {Mensaje}", dto.IdUsuarioVoluntario, dto.IdActividad, codigo, mensaje);
+                return new Respuesta { Exito = 0, Codigo = codigo, Mensaje = mensaje };
+            }
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico en inscripción de participante para actividad ID: {IdActividad}", dto.IdActividad);
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error en la inscripción. {ex.Message}" };
+        }
+    }
+
+    public async Task<Respuesta> AsignarRolAsync(AsignacionRolDto dto)
+    {
+        logger.LogInformation("Iniciando asignación de rol {IdRol} a usuario {IdUsuarioAsignado} en organización {IdOrganizacion}", dto.IdRol, dto.IdUsuarioAsignado, dto.IdOrganizacion);
+
+        await procedureRepository.BeginTransactionAsync();
+        try
+        {
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithOutputNumber("PN_ID_ASIGNACION")
+                .WithOutputVarchar("PV_MENSAJE", 4000)
+                .WithOutputNumber("PN_CODIGO")
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ASIGNAR_ROL_JSON", dyParam);
+
+            var idAsignacion = dyParam.Get<int?>("PN_ID_ASIGNACION");
+            var mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty;
+            var codigo = dyParam.Get<int?>("PN_CODIGO") ?? 0;
+
+            if (idAsignacion.HasValue && idAsignacion > 0)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Asignación de rol exitosa. ID: {IdAsignacion}", idAsignacion);
+                return new Respuesta { Exito = 1, Mensaje = mensaje, IdEntidad = idAsignacion };
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Asignación de rol fallida. Código: {Codigo}, Mensaje: {Mensaje}", codigo, mensaje);
+                return new Respuesta { Exito = 0, Codigo = codigo, Mensaje = mensaje };
+            }
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico en asignación de rol.");
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al asignar el rol. {ex.Message}" };
+        }
+    }
+
+    public async Task<Respuesta> ActualizarPerfilCompletoAsync(ActualizacionPerfilCompletoDto dto)
+    {
+        logger.LogInformation("Iniciando actualización de perfil para el perfil ID: {IdPerfil}", dto.Perfil.IdPerfil);
+
+        await procedureRepository.BeginTransactionAsync();
+        try
+        {
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithStandardOutputs()
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ACTUALIZAR_PERFIL_COMPLETO_JSON", dyParam);
+
+            var exito = dyParam.Get<int>("PN_EXITO");
+            var mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty;
+            var codigo = dyParam.Get<int>("PN_CODIGO");
+
+            if (exito == 1)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Actualización de perfil exitosa para el perfil ID: {IdPerfil}", dto.Perfil.IdPerfil);
+                return new Respuesta { Exito = 1, Mensaje = mensaje };
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Actualización de perfil fallida para el perfil ID: {IdPerfil}. Código: {Codigo}, Mensaje: {Mensaje}", dto.Perfil.IdPerfil, codigo, mensaje);
+                return new Respuesta { Exito = 0, Codigo = codigo, Mensaje = mensaje };
+            }
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico en la actualización del perfil ID: {IdPerfil}", dto.Perfil.IdPerfil);
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al actualizar el perfil. {ex.Message}" };
+        }
+    }
+
+    public async Task<Respuesta> ActualizarActividadAsync(ActividadActualizacionIntegracionDto dto)
+    {
+        logger.LogInformation("Iniciando actualización de actividad ID: {IdActividad}", dto.Actividad.IdActividad);
+
+        await procedureRepository.BeginTransactionAsync();
+        try
+        {
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithStandardOutputs()
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ACTUALIZAR_ACTIVIDAD_JSON", dyParam);
+
+            var exito = dyParam.Get<int>("PN_EXITO");
+            var mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty;
+            var codigo = dyParam.Get<int>("PN_CODIGO");
+            
+            if (exito == 1)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Actualización de actividad exitosa para la actividad ID: {IdActividad}", dto.Actividad.IdActividad);
+                return new Respuesta { Exito = 1, Mensaje = mensaje };
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Actualización de actividad fallida para la actividad ID: {IdActividad}. Código: {Codigo}, Mensaje: {Mensaje}", dto.Actividad.IdActividad, codigo, mensaje);
+                return new Respuesta { Exito = 0, Codigo = codigo, Mensaje = mensaje };
+            }
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico en la actualización de la actividad ID: {IdActividad}", dto.Actividad.IdActividad);
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al actualizar la actividad. {ex.Message}" };
+        }
+    }
 }
 
 // Clases de respuesta auxiliares
@@ -458,4 +755,5 @@ public class Respuesta
     public int? IdUsuario { get; set; }
     public string? Token { get; set; }
     public string? Email { get; set; }
+    public int? IdEntidad { get; set; }
 }

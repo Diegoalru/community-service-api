@@ -40,7 +40,7 @@ public class PerfilRegDto
 {
     [Required(ErrorMessage = "El tipo de identificador es requerido.")]
     [Range(1, int.MaxValue, ErrorMessage = "El tipo de identificador debe ser válido.")]
-    [JsonPropertyName("id_identificador")]
+    [JsonPropertyName("idIdentificador")]
     public int IdIdentificador { get; set; }
 
     [Required(ErrorMessage = "El número de identificación es requerido.")]
@@ -55,19 +55,19 @@ public class PerfilRegDto
 
     [Required(ErrorMessage = "El apellido paterno es requerido.")]
     [StringLength(100, ErrorMessage = "El apellido paterno no puede exceder 100 caracteres.")]
-    [JsonPropertyName("apellido_p")]
+    [JsonPropertyName("apellidoP")]
     public string ApellidoP { get; set; } = string.Empty;
 
     [StringLength(100, ErrorMessage = "El apellido materno no puede exceder 100 caracteres.")]
-    [JsonPropertyName("apellido_m")]
+    [JsonPropertyName("apellidoM")]
     public string? ApellidoM { get; set; }
 
     [Required(ErrorMessage = "La fecha de nacimiento es requerida.")]
     [RegularExpression(@"^\d{4}-\d{2}-\d{2}$", ErrorMessage = "La fecha de nacimiento debe tener formato YYYY-MM-DD.")]
-    [JsonPropertyName("fecha_nacimiento")]
+    [JsonPropertyName("fechaNacimiento")]
     public string FechaNacimiento { get; set; } = string.Empty;
 
-    [JsonPropertyName("id_universidad")]
+    [JsonPropertyName("idUniversidad")]
     public int? IdUniversidad { get; set; }
 
     [StringLength(100, ErrorMessage = "La carrera no puede exceder 100 caracteres.")]
@@ -83,22 +83,22 @@ public class UbicacionRegDto
 {
     [Required(ErrorMessage = "El país es requerido.")]
     [Range(1, int.MaxValue, ErrorMessage = "El país debe ser válido.")]
-    [JsonPropertyName("id_pais")]
+    [JsonPropertyName("idPais")]
     public int IdPais { get; set; }
 
     [Required(ErrorMessage = "La provincia es requerida.")]
     [Range(1, int.MaxValue, ErrorMessage = "La provincia debe ser válida.")]
-    [JsonPropertyName("id_provincia")]
+    [JsonPropertyName("idProvincia")]
     public int IdProvincia { get; set; }
 
     [Required(ErrorMessage = "El cantón es requerido.")]
     [Range(1, int.MaxValue, ErrorMessage = "El cantón debe ser válido.")]
-    [JsonPropertyName("id_canton")]
+    [JsonPropertyName("idCanton")]
     public int IdCanton { get; set; }
 
     [Required(ErrorMessage = "El distrito es requerido.")]
     [Range(1, int.MaxValue, ErrorMessage = "El distrito debe ser válido.")]
-    [JsonPropertyName("id_distrito")]
+    [JsonPropertyName("idDistrito")]
     public int IdDistrito { get; set; }
 
     [StringLength(200, ErrorMessage = "La dirección no puede exceder 200 caracteres.")]
@@ -106,7 +106,7 @@ public class UbicacionRegDto
     public string? Direccion { get; set; }
 
     [StringLength(20, ErrorMessage = "El código postal no puede exceder 20 caracteres.")]
-    [JsonPropertyName("codigo_postal")]
+    [JsonPropertyName("codigoPostal")]
     public string? CodigoPostal { get; set; }
 
     [JsonPropertyName("latitud")]
@@ -120,7 +120,7 @@ public class CorrespondenciaRegDto
 {
     [Required(ErrorMessage = "El tipo de correspondencia es requerido.")]
     [Range(1, int.MaxValue, ErrorMessage = "El tipo de correspondencia debe ser válido.")]
-    [JsonPropertyName("id_tipo_correspondencia")]
+    [JsonPropertyName("idTipoCorrespondencia")]
     public int IdTipoCorrespondencia { get; set; }
 
     [Required(ErrorMessage = "El valor de correspondencia es requerido.")]
