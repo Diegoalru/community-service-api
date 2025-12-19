@@ -14,7 +14,7 @@ namespace community_service_api.Services;
 
 public interface IParticipanteActividadService
 {
-    Task<IEnumerable<ParticipanteActividadDto>> GetAllAsync();
+    Task<IEnumerable<ParticipanteActividad>> GetAllAsync();
     Task<ParticipanteActividadDto?> GetByIdAsync(int id);
     Task<ParticipanteActividadDto> CreateAsync(ParticipanteActividadCreateDto dto);
     Task<bool> UpdateAsync(int id, ParticipanteActividadUpdateDto dto);
@@ -33,10 +33,10 @@ public class ParticipanteActividadService : IParticipanteActividadService
         _procedureRepository = procedureRepository;
     }
 
-    public async Task<IEnumerable<ParticipanteActividadDto>> GetAllAsync()
+    public async Task<IEnumerable<ParticipanteActividad>> GetAllAsync()
     {
-        var entities = await _repository.GetAllAsync();
-        return entities.Select(e => e.ToDto());
+        return await _repository.GetAllAsync();
+        //return entities.Select(e => e.ToDto());
     }
 
     public async Task<ParticipanteActividadDto?> GetByIdAsync(int id)
