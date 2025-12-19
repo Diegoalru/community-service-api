@@ -817,19 +817,44 @@ public class IntegracionService(
 
     public async Task<Respuesta> EliminarUsuarioOrgAsync(EliminarUsuarioOrgDto dto)
     {
-        var jsonPayload = JsonSerializer.Serialize(dto);
-        var dyParam = OracleParameterBuilder.Create()
-            .WithJsonInput(jsonPayload)
-            .WithBasicOutputs()
-            .Build();
-        
-        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ELIMINAR_USUARIO_ORG_JSON", dyParam);
-        
-        return new Respuesta
+        logger.LogInformation("Iniciando eliminación de rol de usuario ID: {IdRolUsuarioOrganizacion}", dto.IdRolUsuarioOrganizacion);
+
+        await procedureRepository.BeginTransactionAsync();
+        try
         {
-            Exito = dyParam.Get<int>("PN_EXITO"),
-            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
-        };
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithBasicOutputs()
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ELIMINAR_USUARIO_ORG_JSON", dyParam);
+
+            var response = new Respuesta
+            {
+                Exito = dyParam.Get<int>("PN_EXITO"),
+                Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+            };
+
+            if (response.Exito == 1)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Rol de usuario ID: {IdRolUsuarioOrganizacion} eliminado exitosamente.", dto.IdRolUsuarioOrganizacion);
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Eliminación de rol de usuario ID: {IdRolUsuarioOrganizacion} fallida. Mensaje: {Mensaje}", dto.IdRolUsuarioOrganizacion, response.Mensaje);
+            }
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico al eliminar rol de usuario ID: {IdRolUsuarioOrganizacion}", dto.IdRolUsuarioOrganizacion);
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al eliminar el usuario de la organización. {ex.Message}" };
+        }
     }
 
     public async Task<Respuesta> ActualizarUsuarioOrgAsync(ActualizarUsuarioOrgDto dto)
@@ -1014,19 +1039,44 @@ public class IntegracionService(
 
     public async Task<Respuesta> CambiarRolUsuarioAsync(CambiarRolUsuarioDto dto)
     {
-        var jsonPayload = JsonSerializer.Serialize(dto);
-        var dyParam = OracleParameterBuilder.Create()
-            .WithJsonInput(jsonPayload)
-            .WithBasicOutputs()
-            .Build();
+        logger.LogInformation("Iniciando cambio de rol para asignación ID: {IdRolUsuarioOrganizacion} al nuevo rol ID: {IdNuevoRol}", dto.IdRolUsuarioOrganizacion, dto.IdNuevoRol);
 
-        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_CAMBIAR_ROL_USUARIO_JSON", dyParam);
-
-        return new Respuesta
+        await procedureRepository.BeginTransactionAsync();
+        try
         {
-            Exito = dyParam.Get<int>("PN_EXITO"),
-            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
-        };
+            var jsonPayload = JsonSerializer.Serialize(dto);
+            var dyParam = OracleParameterBuilder.Create()
+                .WithJsonInput(jsonPayload)
+                .WithBasicOutputs()
+                .Build();
+
+            await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_CAMBIAR_ROL_USUARIO_JSON", dyParam);
+
+            var response = new Respuesta
+            {
+                Exito = dyParam.Get<int>("PN_EXITO"),
+                Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+            };
+
+            if (response.Exito == 1)
+            {
+                await procedureRepository.CommitTransactionAsync();
+                logger.LogInformation("Cambio de rol exitoso para asignación ID: {IdRolUsuarioOrganizacion}", dto.IdRolUsuarioOrganizacion);
+            }
+            else
+            {
+                await procedureRepository.RollbackTransactionAsync();
+                logger.LogWarning("Cambio de rol fallido para asignación ID: {IdRolUsuarioOrganizacion}. Mensaje: {Mensaje}", dto.IdRolUsuarioOrganizacion, response.Mensaje);
+            }
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            await procedureRepository.RollbackTransactionAsync();
+            logger.LogError(ex, "Error crítico al cambiar rol para asignación ID: {IdRolUsuarioOrganizacion}", dto.IdRolUsuarioOrganizacion);
+            return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al cambiar el rol del usuario. {ex.Message}" };
+        }
     }
 }
 
