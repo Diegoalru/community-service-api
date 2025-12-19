@@ -15,7 +15,7 @@ namespace community_service_api.Services;
 
 public interface IHorarioActividadService
 {
-    Task<IEnumerable<HorarioActividadDto>> GetAllAsync();
+    Task<IEnumerable<HorarioActividad>> GetAllAsync();
     Task<HorarioActividadDto?> GetByIdAsync(int id);
     Task<HorarioActividadDto> CreateAsync(HorarioActividadCreateDto dto);
     Task<bool> UpdateAsync(int id, HorarioActividadUpdateDto dto);
@@ -26,10 +26,10 @@ public interface IHorarioActividadService
 public class HorarioActividadService(IRepository<HorarioActividad> repository, IProcedureRepository procedureRepository)
     : IHorarioActividadService
 {
-    public async Task<IEnumerable<HorarioActividadDto>> GetAllAsync()
+    public async Task<IEnumerable<HorarioActividad>> GetAllAsync()
     {
-        var entities = await repository.GetAllAsync();
-        return entities.Select(e => e.ToDto());
+        return await repository.GetAllAsync();
+        //return entities.Select(e => e.ToDto());
     }
 
     public async Task<HorarioActividadDto?> GetByIdAsync(int id)

@@ -73,3 +73,34 @@ public class PerfilCreateDto
 public class PerfilUpdateDto : PerfilCreateDto
 {
 }
+
+public class PerfilDetalleDto
+{
+    public int IdPerfil { get; set; }
+
+    public int IdUsuario { get; set; }
+
+    public int IdUbicacion { get; set; }
+
+    public int IdIdentificador { get; set; }
+
+    public int? IdUniversidad { get; set; }
+
+    public string Identificacion { get; set; } = string.Empty;
+
+    public string Nombre { get; set; } = string.Empty;
+
+    public string ApellidoP { get; set; } = string.Empty;
+
+    public string? ApellidoM { get; set; }
+
+    public DateTime FechaNacimiento { get; set; }
+
+    public string? Carrera { get; set; }
+
+    public string? Bibliografia { get; set; }
+
+    public char Estado { get; set; }
+
+    public UniversidadDto? Universidad { get; set; }
+}

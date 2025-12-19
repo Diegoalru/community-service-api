@@ -8,7 +8,7 @@ public class EmailSendService(IServiceScopeFactory serviceScopeFactory)
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
