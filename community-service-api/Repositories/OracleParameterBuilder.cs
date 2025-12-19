@@ -101,6 +101,15 @@ public class OracleParameterBuilder
     }
 
     /// <summary>
+    /// Agrega un parámetro de salida CLOB personalizado.
+    /// </summary>
+    public OracleParameterBuilder WithOutputClob(string name)
+    {
+        _parameters.Add(name, dbType: OracleMappingType.Clob, direction: ParameterDirection.Output);
+        return this;
+    }
+
+    /// <summary>
     /// Construye y retorna los parámetros Oracle.
     /// </summary>
     public OracleDynamicParameters Build() => _parameters;

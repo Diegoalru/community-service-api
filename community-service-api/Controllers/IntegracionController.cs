@@ -445,4 +445,154 @@ public class IntegracionController(IIntegracionService integracionService) : Con
             return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error interno al procesar la solicitud.", detalle = ex.Message });
         }
     }
+
+    [Authorize]
+    [HttpPost("GetOrganizacionesConEstado")]
+    public async Task<IActionResult> GetOrganizacionesConEstado([FromBody] GetOrganizacionesConEstadoDto dto)
+    {
+        var respuesta = await integracionService.GetOrganizacionesConEstadoAsync(dto);
+        if (respuesta.Exito == 1)
+            return Content(respuesta.JsonResponse ?? "[]", "application/json");
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("GestionarVoluntariado")]
+    public async Task<IActionResult> GestionarVoluntariado([FromBody] GestionarVoluntariadoDto dto)
+    {
+        var respuesta = await integracionService.GestionarVoluntariadoAsync(dto);
+        if (respuesta.Exito == 1)
+            return Ok(new { mensaje = respuesta.Mensaje });
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("GetUsuariosPorOrg")]
+    public async Task<IActionResult> GetUsuariosPorOrg([FromBody] GetUsuariosPorOrgDto dto)
+    {
+        var respuesta = await integracionService.GetUsuariosPorOrgAsync(dto);
+        if (respuesta.Exito == 1)
+            return Content(respuesta.JsonResponse ?? "[]", "application/json");
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("EliminarUsuarioOrg")]
+    public async Task<IActionResult> EliminarUsuarioOrg([FromBody] EliminarUsuarioOrgDto dto)
+    {
+        var respuesta = await integracionService.EliminarUsuarioOrgAsync(dto);
+        if (respuesta.Exito == 1)
+            return Ok(new { mensaje = respuesta.Mensaje });
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+    
+    [Authorize]
+    [HttpPut("ActualizarUsuarioOrg")]
+    public async Task<IActionResult> ActualizarUsuarioOrg([FromBody] ActualizarUsuarioOrgDto dto)
+    {
+        var respuesta = await integracionService.ActualizarUsuarioOrgAsync(dto);
+        if (respuesta.Exito == 1)
+            return Ok(new { mensaje = respuesta.Mensaje });
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+    
+    [Authorize]
+    [HttpPost("GetActividadesPorOrg")]
+    public async Task<IActionResult> GetActividadesPorOrg([FromBody] GetActividadesPorOrgDto dto)
+    {
+        var respuesta = await integracionService.GetActividadesPorOrgAsync(dto);
+        if (respuesta.Exito == 1)
+            return Content(respuesta.JsonResponse ?? "[]", "application/json");
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("GetHorariosPorAct")]
+    public async Task<IActionResult> GetHorariosPorAct([FromBody] GetHorariosPorActDto dto)
+    {
+        var respuesta = await integracionService.GetHorariosPorActAsync(dto);
+        if (respuesta.Exito == 1)
+            return Content(respuesta.JsonResponse ?? "[]", "application/json");
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("EliminarHorario")]
+    public async Task<IActionResult> EliminarHorario([FromBody] EliminarHorarioDto dto)
+    {
+        var respuesta = await integracionService.EliminarHorarioAsync(dto);
+        if (respuesta.Exito == 1)
+            return Ok(new { mensaje = respuesta.Mensaje });
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("EliminarActividad")]
+    public async Task<IActionResult> EliminarActividad([FromBody] EliminarActividadDto dto)
+    {
+        var respuesta = await integracionService.EliminarActividadAsync(dto);
+        if (respuesta.Exito == 1)
+            return Ok(new { mensaje = respuesta.Mensaje });
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+    
+    [Authorize]
+    [HttpPut("ActualizarHorario")]
+    public async Task<IActionResult> ActualizarHorario([FromBody] ActualizarHorarioDto dto)
+    {
+        var respuesta = await integracionService.ActualizarHorarioAsync(dto);
+        if (respuesta.Exito == 1)
+            return Ok(new { mensaje = respuesta.Mensaje });
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("GetOrganizacionById")]
+    public async Task<IActionResult> GetOrganizacionById([FromBody] GetByIdDto dto)
+    {
+        var respuesta = await integracionService.GetOrganizacionByIdAsync(dto);
+        if (respuesta.Exito == 1)
+            return Content(respuesta.JsonResponse ?? "{}", "application/json");
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("GetActividadById")]
+    public async Task<IActionResult> GetActividadById([FromBody] GetByIdDto dto)
+    {
+        var respuesta = await integracionService.GetActividadByIdAsync(dto);
+        if (respuesta.Exito == 1)
+            return Content(respuesta.JsonResponse ?? "{}", "application/json");
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPost("GetHorarioById")]
+    public async Task<IActionResult> GetHorarioById([FromBody] GetByIdDto dto)
+    {
+        var respuesta = await integracionService.GetHorarioByIdAsync(dto);
+        if (respuesta.Exito == 1)
+            return Content(respuesta.JsonResponse ?? "{}", "application/json");
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+
+    [Authorize]
+    [HttpPut("ActualizarOrganizacion")]
+    public async Task<IActionResult> ActualizarOrganizacion([FromBody] ActualizarOrganizacionDto dto)
+    {
+        var respuesta = await integracionService.ActualizarOrganizacionAsync(dto);
+        if (respuesta.Exito == 1)
+            return Ok(new { mensaje = respuesta.Mensaje });
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
+    
+    [Authorize]
+    [HttpPut("CambiarRolUsuario")]
+    public async Task<IActionResult> CambiarRolUsuario([FromBody] CambiarRolUsuarioDto dto)
+    {
+        var respuesta = await integracionService.CambiarRolUsuarioAsync(dto);
+        if (respuesta.Exito == 1)
+            return Ok(new { mensaje = respuesta.Mensaje });
+        return BadRequest(new { mensaje = respuesta.Mensaje, codigoError = respuesta.Codigo });
+    }
 }

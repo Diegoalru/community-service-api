@@ -11,9 +11,9 @@ public class OrganizacionCreacionDto
     [JsonPropertyName("idUsuarioCreador")]
     public int IdUsuarioCreador { get; set; }
 
-    [Required]
-    [JsonPropertyName("idUbicacion")]
-    public int IdUbicacion { get; set; }
+    [Required(ErrorMessage = "Los datos de ubicación son requeridos.")]
+    [JsonPropertyName("ubicacion")]
+    public UbicacionRegDto Ubicacion { get; set; } = new();
 
     [Required]
     [StringLength(255)]
@@ -41,9 +41,6 @@ public class ActividadCreacionIntegracionDto
     [Required]
     [JsonPropertyName("actividad")]
     public ActividadDetalleParaCreacionDto Actividad { get; set; } = null!;
-    
-    [JsonPropertyName("coordinadores")]
-    public List<CoordinadorAsignacionDto> Coordinadores { get; set; } = new();
 }
 
 public class ActividadDetalleParaCreacionDto

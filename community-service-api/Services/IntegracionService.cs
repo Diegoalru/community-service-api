@@ -23,6 +23,21 @@ public interface IIntegracionService
     Task<Respuesta> AsignarRolAsync(AsignacionRolDto dto);
     Task<Respuesta> ActualizarPerfilCompletoAsync(ActualizacionPerfilCompletoDto dto);
     Task<Respuesta> ActualizarActividadAsync(ActividadActualizacionIntegracionDto dto);
+    Task<RespuestaJson> GetOrganizacionesConEstadoAsync(GetOrganizacionesConEstadoDto dto);
+    Task<Respuesta> GestionarVoluntariadoAsync(GestionarVoluntariadoDto dto);
+    Task<RespuestaJson> GetUsuariosPorOrgAsync(GetUsuariosPorOrgDto dto);
+    Task<Respuesta> EliminarUsuarioOrgAsync(EliminarUsuarioOrgDto dto);
+    Task<Respuesta> ActualizarUsuarioOrgAsync(ActualizarUsuarioOrgDto dto);
+    Task<RespuestaJson> GetActividadesPorOrgAsync(GetActividadesPorOrgDto dto);
+    Task<RespuestaJson> GetHorariosPorActAsync(GetHorariosPorActDto dto);
+    Task<Respuesta> EliminarHorarioAsync(EliminarHorarioDto dto);
+    Task<Respuesta> EliminarActividadAsync(EliminarActividadDto dto);
+    Task<Respuesta> ActualizarHorarioAsync(ActualizarHorarioDto dto);
+    Task<RespuestaJson> GetOrganizacionByIdAsync(GetByIdDto dto);
+    Task<RespuestaJson> GetActividadByIdAsync(GetByIdDto dto);
+    Task<RespuestaJson> GetHorarioByIdAsync(GetByIdDto dto);
+    Task<Respuesta> ActualizarOrganizacionAsync(ActualizarOrganizacionDto dto);
+    Task<Respuesta> CambiarRolUsuarioAsync(CambiarRolUsuarioDto dto);
 }
 
 public class IntegracionService(
@@ -744,6 +759,275 @@ public class IntegracionService(
             return new Respuesta { Codigo = -1, Mensaje = $"Ocurrió un error al actualizar la actividad. {ex.Message}" };
         }
     }
+
+    public async Task<RespuestaJson> GetOrganizacionesConEstadoAsync(GetOrganizacionesConEstadoDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithOutputClob("PC_RESULTADOS")
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_GET_ORGANIZACIONES_CON_ESTADO_JSON", dyParam);
+
+        return new RespuestaJson
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty,
+            JsonResponse = dyParam.Get<string>("PC_RESULTADOS")
+        };
+    }
+
+    public async Task<Respuesta> GestionarVoluntariadoAsync(GestionarVoluntariadoDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_GESTIONAR_VOLUNTARIADO_JSON", dyParam);
+        
+        return new Respuesta
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+        };
+    }
+
+    public async Task<RespuestaJson> GetUsuariosPorOrgAsync(GetUsuariosPorOrgDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithOutputClob("PC_RESULTADOS")
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_GET_USUARIOS_POR_ORG_JSON", dyParam);
+        
+        return new RespuestaJson
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty,
+            JsonResponse = dyParam.Get<string>("PC_RESULTADOS")
+        };
+    }
+
+    public async Task<Respuesta> EliminarUsuarioOrgAsync(EliminarUsuarioOrgDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithBasicOutputs()
+            .Build();
+        
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ELIMINAR_USUARIO_ORG_JSON", dyParam);
+        
+        return new Respuesta
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+        };
+    }
+
+    public async Task<Respuesta> ActualizarUsuarioOrgAsync(ActualizarUsuarioOrgDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithBasicOutputs()
+            .Build();
+            
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ACTUALIZAR_USUARIO_ORG_JSON", dyParam);
+        
+        return new Respuesta
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+        };
+    }
+
+    public async Task<RespuestaJson> GetActividadesPorOrgAsync(GetActividadesPorOrgDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithOutputClob("PC_RESULTADOS")
+            .WithBasicOutputs()
+            .Build();
+            
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_GET_ACTIVIDADES_POR_ORG_JSON", dyParam);
+        
+        return new RespuestaJson
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty,
+            JsonResponse = dyParam.Get<string>("PC_RESULTADOS")
+        };
+    }
+
+    public async Task<RespuestaJson> GetHorariosPorActAsync(GetHorariosPorActDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithOutputClob("PC_RESULTADOS")
+            .WithBasicOutputs()
+            .Build();
+            
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_GET_HORARIOS_POR_ACT_JSON", dyParam);
+        
+        return new RespuestaJson
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty,
+            JsonResponse = dyParam.Get<string>("PC_RESULTADOS")
+        };
+    }
+
+    public async Task<Respuesta> EliminarHorarioAsync(EliminarHorarioDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithBasicOutputs()
+            .Build();
+            
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ELIMINAR_HORARIO_JSON", dyParam);
+        
+        return new Respuesta
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+        };
+    }
+
+    public async Task<Respuesta> EliminarActividadAsync(EliminarActividadDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithBasicOutputs()
+            .Build();
+            
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ELIMINAR_ACTIVIDAD_JSON", dyParam);
+        
+        return new Respuesta
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+        };
+    }
+
+    public async Task<Respuesta> ActualizarHorarioAsync(ActualizarHorarioDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ACTUALIZAR_HORario_JSON", dyParam);
+        
+        return new Respuesta
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+        };
+    }
+
+    public async Task<RespuestaJson> GetOrganizacionByIdAsync(GetByIdDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(new { idOrganizacion = dto.Id });
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithOutputClob("PC_RESULTADOS")
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_GET_ORGANIZACION_POR_ID_JSON", dyParam);
+
+        return new RespuestaJson
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty,
+            JsonResponse = dyParam.Get<string>("PC_RESULTADOS")
+        };
+    }
+
+    public async Task<RespuestaJson> GetActividadByIdAsync(GetByIdDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(new { idActividad = dto.Id });
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithOutputClob("PC_RESULTADOS")
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_GET_ACTIVIDAD_POR_ID_JSON", dyParam);
+
+        return new RespuestaJson
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty,
+            JsonResponse = dyParam.Get<string>("PC_RESULTADOS")
+        };
+    }
+
+    public async Task<RespuestaJson> GetHorarioByIdAsync(GetByIdDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(new { idHorarioActividad = dto.Id });
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithOutputClob("PC_RESULTADOS")
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_GET_HORARIO_POR_ID_JSON", dyParam);
+
+        return new RespuestaJson
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty,
+            JsonResponse = dyParam.Get<string>("PC_RESULTADOS")
+        };
+    }
+
+    public async Task<Respuesta> ActualizarOrganizacionAsync(ActualizarOrganizacionDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_ACTUALIZAR_ORGANIZACION_JSON", dyParam);
+
+        return new Respuesta
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+        };
+    }
+
+    public async Task<Respuesta> CambiarRolUsuarioAsync(CambiarRolUsuarioDto dto)
+    {
+        var jsonPayload = JsonSerializer.Serialize(dto);
+        var dyParam = OracleParameterBuilder.Create()
+            .WithJsonInput(jsonPayload)
+            .WithBasicOutputs()
+            .Build();
+
+        await procedureRepository.ExecuteVoidAsync("PKG_INTEGRACION.P_CAMBIAR_ROL_USUARIO_JSON", dyParam);
+
+        return new Respuesta
+        {
+            Exito = dyParam.Get<int>("PN_EXITO"),
+            Mensaje = dyParam.Get<string>("PV_MENSAJE") ?? string.Empty
+        };
+    }
 }
 
 // Clases de respuesta auxiliares
@@ -756,4 +1040,9 @@ public class Respuesta
     public string? Token { get; set; }
     public string? Email { get; set; }
     public int? IdEntidad { get; set; }
+}
+
+public class RespuestaJson : Respuesta
+{
+    public string? JsonResponse { get; set; }
 }
